@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Waiting Room Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=General+Sans:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- 전체 화면 SVG (그리드/엔티티/레이어) -->
+    <svg id="stage" class="stage" viewBox="-120 -120 440 440" role="img" aria-label="Waiting room visualization">
+      <defs id="defs-root"></defs>
+      <g id="grid-circles"></g>
+      <g id="grid-spokes"></g>
+      <g id="outer-segments"></g>
+      <g id="entities"></g>
+    </svg>
+
+    <!-- 호버 리플 & 텍스트 -->
+    <div id="hover-overlay" class="hover-overlay" aria-hidden="true">
+      <div id="hover-text" class="hover-text"></div>
+    </div>
+
+    <!-- Opening / Closing -->
+   <div id="screen" class="screen">
+  <video
+    id="introVideo"
+    muted
+    playsinline
+    preload="auto"
+    autoplay
+    class="intro-video"
+  >
+    <source src="opening.mp4" type="video/mp4" />
+  </video>
+</div>
+
+    <!-- UI (헤더/사이드 패널) -->
+    <div id="app" class="app is-hidden" aria-live="polite">
+      <header class="site-header">
+        <div class="header-spacer"></div>
+        <h1 id="clock" class="clock">04:56:00</h1>
+        <nav class="top-nav" aria-label="Top Navigation">
+          <button id="btn-about" class="navbtn" type="button">About</button>
+          <button id="btn-key" class="navbtn" type="button">Key</button>
+        </nav>
+      </header>
+
+      <section class="left">
+        <h3 class="side-title">Observe people...</h3>
+        <div class="toggle" data-key="outfitColor"><span class="dot"></span><span class="label">Outfit Color</span></div>
+        <div class="toggle" data-key="dwellTime"><span class="dot"></span><span class="label">Dwell Time</span></div>
+        <div class="toggle" data-key="behaviour"><span class="dot"></span><span class="label">Behaviour</span></div>
+        <div class="toggle" data-key="path"><span class="dot"></span><span class="label">Path</span></div>
+        <div class="toggle" data-key="companions"><span class="dot"></span><span class="label">Companions</span></div>
+      </section>
+
+      <section class="right">
+        <div class="view-toggle" data-view="aerial"><span class="dot"></span><span class="label">Aerial View</span></div>
+        <div class="view-toggle" data-view="exploded"><span class="dot"></span><span class="label">Exploded View</span></div>
+      </section>
+    </div>
+
+    <!-- About / Key 오버레이 -->
+    <div id="overlay" class="overlay is-hidden" role="dialog" aria-modal="true">
+      <div class="overlay-card">
+        <h2 id="overlay-title" class="overlay-title">About</h2>
+        <div id="overlay-body" class="overlay-body">
+          This visualization captures three minutes in the Providence Train Station waiting room,
+          just before the 4:59 PM train departure.
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
