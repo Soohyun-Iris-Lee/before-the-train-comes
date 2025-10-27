@@ -12,7 +12,7 @@
 
   /* 스테이지 위치/크기(한 번에 조절) */
   --stage-scale: 1.80;     /* 그리드 전체 크기 비율 */
-  --stage-shift-y: 42px;   /* 그리드를 화면 아래로 이동 */
+  --stage-shift-y: 60px;   /* 그리드를 화면 아래로 이동 */
 
   /* 시계 */
   --clock-size: 98px;
@@ -165,3 +165,66 @@ body{
 
 /* (선택) 전환 중 인터랙션 잠깐 막기 */
 .body--transitioning #entities { pointer-events:none; }
+
+
+/* === Top-nav Hover Glow (About/Key 전용, 쨍한 버전) === */
+/* === Top-nav Hover Glow (자연스러운 가장자리 페이드) === */
+/* === Top-nav Hover Glow (경계 0%까지 자연 페이드) === */
+/* 헤더 버튼 호버용 글로우 레이어 */
+/* nav 컨테이너 */
+.top-nav { display:flex; gap:32px; align-items:center; }
+
+/* 각 버튼+설명 묶음 */
+.nav-item { position:relative; }
+
+/* 버튼 기본/호버 색 */
+.nav-btn{
+  background:none; border:0; cursor:pointer;
+  font:600 1rem/1 "General Sans", sans-serif;
+  color:#fffbe0; transition:color .25s ease;
+}
+.nav-item:hover .nav-btn{ color:#532b2f; }
+
+/* 설명 툴팁: 기본 숨김, hover 시 보이기 */
+.desc{
+   position: fixed;            /* 화면 기준 중앙 배치 */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(10px);
+  width: auto;
+  max-width: 480px;
+  text-align: center;
+  font-family: 'General Sans', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #532b2f;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  background: none;           /* 🔥 배경 박스 제거 */
+  box-shadow: none;           /* 그림자 제거 */
+  padding: 0;    
+}
+.nav-item:hover .desc {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateY(0);
+}
+
+/* 헤더 버튼 호버용 글로우 레이어(가득 퍼지고 가장자리 0%) */
+.nav-glow{
+  position:fixed; inset:0; z-index:25; pointer-events:none;
+  --nx:50%; --ny:50%; --r:0vmax;
+  background: radial-gradient(
+    circle at var(--nx) var(--ny),
+    rgba(255,250,216,0.96) 0%,
+    rgba(255,250,216,0.94) 12%,
+    rgba(255,250,216,0.90) 28%,
+    rgba(255,250,216,0.78) 48%,
+    rgba(255,250,216,0.56) 70%,
+    rgba(255,250,216,0.22) 90%,
+    rgba(255,250,216,0.00) 100%
+  );
+  clip-path:circle(var(--r) at var(--nx) var(--ny));
+  opacity:0; transition:clip-path .5s ease, opacity .5s ease;
+}
+.nav-glow.show{ --r:1000vmax; opacity:1; }

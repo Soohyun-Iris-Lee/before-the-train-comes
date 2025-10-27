@@ -11,44 +11,70 @@
   </head>
 
   <body>
-    <!-- 전체 화면 SVG (그리드/엔티티/레이어) -->
-    <svg id="stage" class="stage" viewBox="-120 -120 440 440" role="img" aria-label="Waiting room visualization">
-      <defs id="defs-root"></defs>
-      <g id="grid-circles"></g>
-      <g id="grid-spokes"></g>
-      <g id="outer-segments"></g>
-      <g id="entities"></g>
-    </svg>
+    <!-- 화면 전체를 덮는 SVG (그리드/엔티티) -->
+<!-- 기존: viewBox="0 0 200 200" -->
+<svg id="stage" class="stage" viewBox="-120 -120 440 440" role="img" aria-label="Waiting room visualization">
+  <defs id="defs-root"></defs>
+  <g id="grid-circles"></g>
+  <g id="grid-spokes"></g>
+  <g id="outer-segments"></g>
+  <g id="entities"></g>
+</svg>
 
-    <!-- 호버 리플 & 텍스트 -->
+    <!-- 호버 리플 & 텍스트 (사람 위치 기준으로 즉시 피어남) -->
     <div id="hover-overlay" class="hover-overlay" aria-hidden="true">
       <div id="hover-text" class="hover-text"></div>
     </div>
+    <!-- 호버 리플 & 텍스트 -->
+<div id="hover-overlay" class="hover-overlay" aria-hidden="true">
+  <div id="hover-text" class="hover-text"></div>
+</div>
+
+<!-- 🔥 Top-nav 전용 글로우 레이어 (엔티티 오버레이와 별개) -->
+<div id="nav-glow" class="nav-glow" aria-hidden="true"></div>
+
 
     <!-- Opening / Closing -->
-   <div id="screen" class="screen">
-  <video
-    id="introVideo"
-    muted
-    playsinline
-    preload="auto"
-    autoplay
-    class="intro-video"
-  >
-    <source src="opening.mp4" type="video/mp4" />
-  </video>
-</div>
+    <div id="screen" class="screen">
+      <div class="screen-inner">
+        <div id="screen-title" class="screen-title">Opening Animation</div>
+        <div class="screen-sub">(Replace with your MP4)</div>
+      </div>
+    </div>
 
     <!-- UI (헤더/사이드 패널) -->
     <div id="app" class="app is-hidden" aria-live="polite">
       <header class="site-header">
-        <div class="header-spacer"></div>
-        <h1 id="clock" class="clock">04:56:00</h1>
-        <nav class="top-nav" aria-label="Top Navigation">
-          <button id="btn-about" class="navbtn" type="button">About</button>
-          <button id="btn-key" class="navbtn" type="button">Key</button>
-        </nav>
-      </header>
+  <div class="header-spacer"></div>
+  <h1 id="clock" class="clock">04:56:00</h1>
+
+  <!-- 단 하나의 nav, 버튼과 설명을 같은 컨테이너로 묶음 -->
+  <nav class="top-nav" aria-label="Top Navigation">
+    <div class="nav-item">
+      <button id="btn-about" class="nav-btn" type="button">About</button>
+      <div id="about-desc" class="desc">This visualization captures three minutes in the Providence Train Station waiting room, just before the 4:59 PM train departure.</div>
+    </div>
+    <div class="nav-item">
+      <button id="btn-key" class="nav-btn" type="button">Key</button>
+      <div id="key-desc" class="desc">
+        Outfit Color: colors of clothing<br>
+        Dwell Time: expanding circles when people stay still<br>
+        Behaviour: text labels describing activities<br>
+        Path: trajectory lines<br>
+        Companions: dogs, bikes, strollers
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- 오버레이는 하나만 유지 -->
+<div id="hover-overlay" class="hover-overlay" aria-hidden="true">
+  <div id="hover-text" class="hover-text"></div>
+</div>
+
+<!-- Top-nav 전용 글로우 레이어도 하나만 -->
+<div id="nav-glow" class="nav-glow" aria-hidden="true"></div>
+
 
       <section class="left">
         <h3 class="side-title">Observe people...</h3>
@@ -65,16 +91,7 @@
       </section>
     </div>
 
-    <!-- About / Key 오버레이 -->
-    <div id="overlay" class="overlay is-hidden" role="dialog" aria-modal="true">
-      <div class="overlay-card">
-        <h2 id="overlay-title" class="overlay-title">About</h2>
-        <div id="overlay-body" class="overlay-body">
-          This visualization captures three minutes in the Providence Train Station waiting room,
-          just before the 4:59 PM train departure.
-        </div>
-      </div>
-    </div>
+
 
     <script src="script.js"></script>
   </body>

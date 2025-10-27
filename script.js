@@ -1,18 +1,44 @@
 /* ===================== 데이터 ===================== */
-const rawData = { /* ── (사용자 데이터 그대로) ── */ 
-  'P01':{type:'person',colors:['#d3dcdd','#bcb93d','#eab4c9'],hoverText:'Came in a pair - they look calm, maybe used to this commute. Kept checking the time but not in a rushed way.',frames:[{time:0,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'arrive together'},{time:10,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'quick chat'},{time:20,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'checking time'},{time:50,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:80,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:120,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'glances at time'},{time:160,angleDeg:140,radiusFactor:0.92,motion:'MOVING',behavior:'gets up'},{time:170,angleDeg:65,radiusFactor:0.8,motion:'MOVING',behavior:'walks to exit'},{time:180,angleDeg:65,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'P02':{type:'person',colors:['#e4c7d0','#a46269','#795664'],hoverText:'The planner of the two. Did the quick timetable check and nodded.',frames:[{time:0,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'arrive with partner'},{time:20,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching sandwich'},{time:40,angleDeg:135,radiusFactor:0.92,motion:'MOVING',behavior:'gets up'},{time:50,angleDeg:80,radiusFactor:0.7,motion:'MOVING',behavior:'scans timetable'},{time:60,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching sandwich'},{time:120,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'smiles at stroller'},{time:160,angleDeg:135,radiusFactor:0.92,motion:'MOVING',behavior:'gets up'},{time:170,angleDeg:68,radiusFactor:0.8,motion:'MOVING',behavior:'leaves to train'},{time:180,angleDeg:68,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'P03':{type:'person',colors:['#55533e','#a4ac72','#fadf85'],hoverText:'Wandered a lot, could not sit still. Just curious about everything.',frames:[{time:0,angleDeg:240,radiusFactor:1.08,motion:'STILL',behavior:''},{time:40,angleDeg:240,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:50,angleDeg:50,radiusFactor:0.4,motion:'MOVING',behavior:'slow walk'},{time:60,angleDeg:40,radiusFactor:0.4,motion:'MOVING',behavior:'circling'},{time:70,angleDeg:20,radiusFactor:0.45,motion:'MOVING',behavior:'peeks outside'},{time:80,angleDeg:30,radiusFactor:0.92,motion:'STILL',behavior:'checks time'},{time:130,angleDeg:30,radiusFactor:0.92,motion:'MOVING',behavior:'grabs backpack'},{time:140,angleDeg:43,radiusFactor:1.08,motion:'STILL',behavior:''},{time:180,angleDeg:43,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'P04':{type:'person',colors:['#a28948','#733e2e','#7184b9'],hoverText:'Sat for a while then got coffee. Calm routine.',frames:[{time:0,angleDeg:210,radiusFactor:0.92,motion:'MOVING',behavior:'already seated'},{time:10,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:''},{time:90,angleDeg:235,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:100,angleDeg:118,radiusFactor:0.58,motion:'STILL',behavior:'adjusts coat'},{time:130,angleDeg:100,radiusFactor:0.5,motion:'MOVING',behavior:'nods to self'},{time:140,angleDeg:350,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:180,angleDeg:350,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'P05':{type:'person',colors:['#5a3b4f','#edceb7','#ce6641'],hoverText:'Waiting for someone, kept checking the door and pacing. Big smile when partner showed up.',frames:[{time:0,angleDeg:65,radiusFactor:1.08,motion:'STILL',behavior:''},{time:10,angleDeg:65,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:20,angleDeg:320,radiusFactor:0.92,motion:'STILL',behavior:'scans doorway'},{time:40,angleDeg:320,radiusFactor:0.92,motion:'MOVING',behavior:'stands again'},{time:50,angleDeg:335,radiusFactor:0.93,motion:'STILL',behavior:'pacing slowly'},{time:60,angleDeg:335,radiusFactor:0.93,motion:'MOVING',behavior:'eyes on entrance'},{time:70,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:''},{time:180,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'P06':{type:'person',colors:['#192f46','#ab4539','#592828'],hoverText:'Got off the train, spotted P05 immediately. Quick hug, both smiling.',frames:[{time:0,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:''},{time:50,angleDeg:352,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:60,angleDeg:337,radiusFactor:0.93,motion:'MOVING',behavior:'hugs p5'},{time:70,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:''},{time:180,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'P07':{type:'person',colors:['#859bcc','#ffffff','#282e75'],hoverText:'Stayed almost the whole time. Looked relaxed, maybe waiting for someone.',frames:[{time:0,angleDeg:226,radiusFactor:1.08,motion:'STILL',behavior:''},{time:50,angleDeg:226,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:60,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'shifts weight'},{time:90,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'adjusts strap'},{time:130,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'scrolling phone'},{time:180,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'}]},
-  'P08':{type:'person',colors:['#5550e9','#5f0f39','#1f4d51'],hoverText:'Two students, probably friends. Checked their phones a lot, laughed at something.',frames:[{time:0,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'students enter'},{time:10,angleDeg:260,radiusFactor:0.92,motion:'MOVING',behavior:'backpack shuffle'},{time:20,angleDeg:108,radiusFactor:0.38,motion:'STILL',behavior:'checks time'},{time:30,angleDeg:108,radiusFactor:0.38,motion:'MOVING',behavior:'points to seats'},{time:40,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'sits down'},{time:90,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'adjusts backpack'},{time:170,angleDeg:260,radiusFactor:0.92,motion:'MOVING',behavior:'friend near'},{time:180,angleDeg:52,radiusFactor:1.08,motion:'STILL',behavior:'still waiting'}]},
-  'P09':{type:'person',colors:['#ffffff','#aab5a6','#2d2726'],hoverText:'Student. Sat for a while, bathroom break, then came back. Very chill.',frames:[{time:0,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'walk in'},{time:10,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'sit down'},{time:40,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'stands up'},{time:50,angleDeg:265,radiusFactor:0.92,motion:'MOVING',behavior:'heads bathroom'},{time:60,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:''},{time:160,angleDeg:175,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:170,angleDeg:269,radiusFactor:0.8,motion:'MOVING',behavior:'quick wave'},{time:180,angleDeg:55,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'Dog 1':{type:'companion',colors:['#8B4513','#8B4513','#8B4513'],hoverText:'Quiet, well-behaved. Barely moved, just followed with its eyes.',frames:[{time:0,angleDeg:228,radiusFactor:1.08,motion:'STILL',behavior:''},{time:50,angleDeg:228,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:60,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'leans closer'},{time:90,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'perks ears'},{time:180,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'}]},
-  'Dog 2':{type:'companion',colors:['#A0522D','#A0522D','#A0522D'],hoverText:'Waited patiently while owner got coffee. Used to this routine.',frames:[{time:0,angleDeg:212,radiusFactor:0.92,motion:'MOVING',behavior:'heel by owner'},{time:10,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:''},{time:90,angleDeg:237,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:100,angleDeg:120,radiusFactor:0.58,motion:'STILL',behavior:'sits near'},{time:130,angleDeg:102,radiusFactor:0.5,motion:'MOVING',behavior:'ready to go'},{time:140,angleDeg:352,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:180,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'Bike 1':{type:'companion',colors:['#4682B4','#4682B4','#4682B4'],hoverText:'Leaned against a wall. Signs of wear from constant use.',frames:[{time:0,angleDeg:242,radiusFactor:1.08,motion:'STILL',behavior:''},{time:40,angleDeg:242,radiusFactor:1.08,motion:'MOVING',behavior:''},{time:50,angleDeg:52,radiusFactor:0.4,motion:'MOVING',behavior:'rolling along'},{time:70,angleDeg:22,radiusFactor:0.45,motion:'MOVING',behavior:'rolling along'},{time:80,angleDeg:32,radiusFactor:0.92,motion:'STILL',behavior:'parked briefly'},{time:130,angleDeg:32,radiusFactor:0.92,motion:'MOVING',behavior:'careful steer'},{time:140,angleDeg:45,radiusFactor:1.08,motion:'STILL',behavior:''},{time:180,angleDeg:45,radiusFactor:1.08,motion:'STILL',behavior:''}]},
-  'Stroller 1':{type:'companion',colors:['#FFB6C1','#FFB6C1','#FFB6C1'],hoverText:'The baby was quiet the whole time. Maybe sleeping.',frames:[{time:0,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'rolled beside mom'},{time:10,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'gentle rock'},{time:80,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'light sway'},{time:120,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'follow p2'},{time:160,angleDeg:142,radiusFactor:0.92,motion:'MOVING',behavior:'near platform'},{time:170,angleDeg:67,radiusFactor:0.8,motion:'MOVING',behavior:'short wait'},{time:180,angleDeg:67,radiusFactor:1.08,motion:'STILL',behavior:''}]}
+const rawData = { /* ── merged with CSV frames; colors + hoverText preserved ── */
+  'P01':{type:'person',colors:['#d3dcdd','#bcb93d','#eab4c9'],hoverText:'Came in a pair - they look calm, maybe used to this commute. Kept checking the time but not in a rushed way.',frames:[
+    {time:0,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'arrive together'},{time:10,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'quick chat'},{time:20,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'checking time'},{time:30,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'quick chat'},{time:40,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'quick chat'},{time:50,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:60,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:70,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'listening to music'},{time:80,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:90,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:100,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:110,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:120,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'glances at train time'},{time:130,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:140,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:150,angleDeg:140,radiusFactor:0.92,motion:'STILL',behavior:'looks at phone'},{time:160,angleDeg:140,radiusFactor:0.92,motion:'MOVING',behavior:'gets up'},{time:170,angleDeg:65,radiusFactor:0.8,motion:'MOVING',behavior:'walks toward exit'},{time:180,angleDeg:65,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'P02':{type:'person',colors:['#e4c7d0','#a46269','#795664'],hoverText:'The planner of the two. Did the quick timetable check and nodded.',frames:[
+    {time:0,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'arrive with partner'},{time:10,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching on sandwich'},{time:20,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching on sandwich'},{time:30,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching on sandwich'},{time:40,angleDeg:135,radiusFactor:0.92,motion:'MOVING',behavior:'gets up'},{time:50,angleDeg:80,radiusFactor:0.7,motion:'MOVING',behavior:'scans timetable'},{time:60,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching on sandwich'},{time:70,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching on sandwich'},{time:80,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'munching on sandwich'},{time:90,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'nods yes'},{time:100,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'drink water'},{time:110,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'glances at stroller'},{time:120,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'smiles at stroller'},{time:130,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'scrolls on phone'},{time:140,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'scrolls on phone'},{time:150,angleDeg:135,radiusFactor:0.92,motion:'STILL',behavior:'scrolls on phone'},{time:160,angleDeg:135,radiusFactor:0.92,motion:'MOVING',behavior:'gets up, checks baby'},{time:170,angleDeg:68,radiusFactor:0.8,motion:'MOVING',behavior:'leaves to train'},{time:180,angleDeg:68,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'P03':{type:'person',colors:['#55533e','#a4ac72','#fadf85'],hoverText:'Wandered a lot, could not sit still. Just curious about everything.',frames:[
+    {time:0,angleDeg:240,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:10,angleDeg:240,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:20,angleDeg:240,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:30,angleDeg:240,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:40,angleDeg:240,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:50,angleDeg:50,radiusFactor:0.4,motion:'MOVING',behavior:'slow walk'},{time:60,angleDeg:40,radiusFactor:0.4,motion:'MOVING',behavior:'circling benches'},{time:70,angleDeg:20,radiusFactor:0.45,motion:'MOVING',behavior:'peeks outside'},{time:80,angleDeg:30,radiusFactor:0.92,motion:'STILL',behavior:'checks time'},{time:90,angleDeg:30,radiusFactor:0.92,motion:'STILL',behavior:'stretches legs'},{time:100,angleDeg:30,radiusFactor:0.92,motion:'STILL',behavior:'loops around'},{time:110,angleDeg:30,radiusFactor:0.92,motion:'STILL',behavior:'sips water'},{time:120,angleDeg:30,radiusFactor:0.92,motion:'STILL',behavior:'heads back'},{time:130,angleDeg:30,radiusFactor:0.92,motion:'MOVING',behavior:'grabs backpack'},{time:140,angleDeg:43,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:150,angleDeg:43,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:160,angleDeg:43,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:170,angleDeg:43,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:180,angleDeg:43,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'P04':{type:'person',colors:['#a28948','#733e2e','#7184b9'],hoverText:'Sat for a while then got coffee. Calm routine.',frames:[
+    {time:0,angleDeg:210,radiusFactor:0.92,motion:'MOVING',behavior:'already seated'},{time:10,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:20,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:30,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:40,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:50,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:60,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:70,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:80,angleDeg:235,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:90,angleDeg:235,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:100,angleDeg:118,radiusFactor:0.58,motion:'STILL',behavior:'adjusts coat'},{time:110,angleDeg:118,radiusFactor:0.58,motion:'STILL',behavior:'stands slowly'},{time:120,angleDeg:118,radiusFactor:0.58,motion:'MOVING',behavior:'looks to board'},{time:130,angleDeg:100,radiusFactor:0.5,motion:'MOVING',behavior:'nods to self'},{time:140,angleDeg:350,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:150,angleDeg:230,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:160,angleDeg:350,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:170,angleDeg:350,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:180,angleDeg:350,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'P05':{type:'person',colors:['#5a3b4f','#edceb7','#ce6641'],hoverText:'Waiting for someone, kept checking the door and pacing. Big smile when partner showed up.',frames:[
+    {time:0,angleDeg:65,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:10,angleDeg:65,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:20,angleDeg:320,radiusFactor:0.92,motion:'STILL',behavior:'scans doorway'},{time:30,angleDeg:320,radiusFactor:0.92,motion:'STILL',behavior:'sits briefly'},{time:40,angleDeg:320,radiusFactor:0.92,motion:'MOVING',behavior:'stands again'},{time:50,angleDeg:335,radiusFactor:0.93,motion:'STILL',behavior:'pacing slowly'},{time:60,angleDeg:335,radiusFactor:0.93,motion:'MOVING',behavior:'eyes on entrance'},{time:70,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:80,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:90,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:100,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:110,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:120,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:130,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:140,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:150,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:160,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:170,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:180,angleDeg:230,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'P06':{type:'person',colors:['#192f46','#ab4539','#592828'],hoverText:'Got off the train, spotted P05 immediately. Quick hug, both smiling.',frames:[
+    {time:0,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:10,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:20,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:30,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:40,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:50,angleDeg:352,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:60,angleDeg:337,radiusFactor:0.93,motion:'MOVING',behavior:'hugs p5'},{time:70,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:80,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:90,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:100,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:110,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:120,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:130,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:140,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:150,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:160,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:170,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:180,angleDeg:232,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'P07':{type:'person',colors:['#859bcc','#ffffff','#282e75'],hoverText:'Stayed almost the whole time. Looked relaxed, maybe waiting for someone.',frames:[
+    {time:0,angleDeg:226,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:10,angleDeg:226,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:20,angleDeg:226,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:30,angleDeg:226,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:40,angleDeg:226,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:50,angleDeg:226,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:60,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'shifts weight'},{time:70,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'glances left'},{time:80,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'glances right'},{time:90,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'adjusts strap'},{time:100,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'stretches neck'},{time:110,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'tiny step'},{time:120,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'stays put'},{time:130,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'scrolling phone'},{time:140,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'pockets hands'},{time:150,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'watching people'},{time:160,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'},{time:170,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'},{time:180,angleDeg:213,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'}
+  ]},
+  'P08':{type:'person',colors:['#5550e9','#5f0f39','#1f4d51'],hoverText:'Two students, probably friends. Checked their phones a lot, laughed at something.',frames:[
+    {time:0,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'students enter'},{time:10,angleDeg:260,radiusFactor:0.92,motion:'MOVING',behavior:'backpack shuffle'},{time:20,angleDeg:108,radiusFactor:0.38,motion:'STILL',behavior:'checks time'},{time:30,angleDeg:108,radiusFactor:0.38,motion:'MOVING',behavior:'points to seats'},{time:40,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'sits down'},{time:50,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'whispers chat'},{time:60,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'texting friend'},{time:70,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'checks door'},{time:80,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'small laugh'},{time:90,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'adjusts backpack'},{time:100,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'},{time:110,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'glances at board'},{time:120,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'waves at someone'},{time:130,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'stands slightly'},{time:140,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'sits again'},{time:150,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'looks relaxed'},{time:160,angleDeg:260,radiusFactor:0.92,motion:'STILL',behavior:'scrolling phone'},{time:170,angleDeg:260,radiusFactor:0.92,motion:'MOVING',behavior:'friend near?'},{time:180,angleDeg:52,radiusFactor:1.08,motion:'STILL',behavior:'still waiting'}
+  ]},
+  'P09':{type:'person',colors:['#ffffff','#aab5a6','#2d2726'],hoverText:'Student. Sat for a while, bathroom break, then came back. Very chill.',frames:[
+    {time:0,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'walk in'},{time:10,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'sit down'},{time:20,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'backpack off'},{time:30,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'quick joke'},{time:40,angleDeg:265,radiusFactor:0.92,motion:'STILL',behavior:'stands up'},{time:50,angleDeg:265,radiusFactor:0.92,motion:'MOVING',behavior:'heads bathroom'},{time:60,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:70,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:80,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:90,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:100,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:110,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:120,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:130,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:140,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:150,angleDeg:175,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:160,angleDeg:175,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:170,angleDeg:269,radiusFactor:0.8,motion:'MOVING',behavior:'quick wave'},{time:180,angleDeg:55,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'Dog 1':{type:'companion',colors:['#8B4513','#8B4513','#8B4513'],hoverText:'Quiet, well-behaved. Barely moved, just followed with its eyes.',frames:[
+    {time:0,angleDeg:228,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:10,angleDeg:228,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:20,angleDeg:228,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:30,angleDeg:228,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:40,angleDeg:228,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:50,angleDeg:228,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:60,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'leans closer'},{time:70,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'quiet watch'},{time:80,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'small sniff'},{time:90,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'perks ears'},{time:100,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'perks ears'},{time:110,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'looks left'},{time:120,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'looks right'},{time:130,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'sits calmly'},{time:140,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'sits calmly'},{time:150,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'},{time:160,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'},{time:170,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'},{time:180,angleDeg:215,radiusFactor:0.92,motion:'STILL',behavior:'still waiting'}
+  ]},
+  'Dog 2':{type:'companion',colors:['#A0522D','#A0522D','#A0522D'],hoverText:'Waited patiently while owner got coffee. Used to this routine.',frames:[
+    {time:0,angleDeg:212,radiusFactor:0.92,motion:'MOVING',behavior:'heel by owner'},{time:10,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:20,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:30,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:40,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:50,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:60,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:70,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:80,angleDeg:237,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:90,angleDeg:237,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:100,angleDeg:120,radiusFactor:0.58,motion:'STILL',behavior:'sits near'},{time:110,angleDeg:120,radiusFactor:0.58,motion:'STILL',behavior:'watches feet'},{time:120,angleDeg:120,radiusFactor:0.58,motion:'MOVING',behavior:'alert ears'},{time:130,angleDeg:102,radiusFactor:0.5,motion:'MOVING',behavior:'ready to go'},{time:140,angleDeg:352,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:150,angleDeg:232,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:160,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:170,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:180,angleDeg:352,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'Bike 1':{type:'companion',colors:['#4682B4','#4682B4','#4682B4'],hoverText:'Leaned against a wall. Signs of wear from constant use.',frames:[
+    {time:0,angleDeg:242,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:10,angleDeg:242,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:20,angleDeg:242,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:30,angleDeg:242,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:40,angleDeg:242,radiusFactor:1.08,motion:'MOVING',behavior:'nan'},{time:50,angleDeg:52,radiusFactor:0.4,motion:'MOVING',behavior:'rolling along'},{time:60,angleDeg:42,radiusFactor:0.4,motion:'MOVING',behavior:'rolling along'},{time:70,angleDeg:22,radiusFactor:0.45,motion:'MOVING',behavior:'rolling along'},{time:80,angleDeg:32,radiusFactor:0.92,motion:'STILL',behavior:'parked briefly'},{time:90,angleDeg:32,radiusFactor:0.92,motion:'STILL',behavior:'parked briefly'},{time:100,angleDeg:32,radiusFactor:0.92,motion:'STILL',behavior:'hand on bar'},{time:110,angleDeg:32,radiusFactor:0.92,motion:'STILL',behavior:'parked briefly'},{time:120,angleDeg:32,radiusFactor:0.92,motion:'STILL',behavior:'parked briefly'},{time:130,angleDeg:32,radiusFactor:0.92,motion:'MOVING',behavior:'careful steer'},{time:140,angleDeg:45,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:150,angleDeg:45,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:160,angleDeg:45,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:170,angleDeg:45,radiusFactor:1.08,motion:'STILL',behavior:'nan'},{time:180,angleDeg:45,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]},
+  'Stroller 1':{type:'companion',colors:['#FFB6C1','#FFB6C1','#FFB6C1'],hoverText:'The baby was quiet the whole time. Maybe sleeping.',frames:[
+    {time:0,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'rolled beside mom'},{time:10,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'gentle rock'},{time:20,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'quiet fuss'},{time:30,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'gentle rock'},{time:40,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'still now'},{time:50,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'p1 checks time'},{time:60,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'soft coo'},{time:70,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'settles again'},{time:80,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'light sway'},{time:90,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'wheels locked'},{time:100,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'unlock wheels'},{time:110,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'slow roll'},{time:120,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'follow p2'},{time:130,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'steady roll'},{time:140,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'weaving gently'},{time:150,angleDeg:142,radiusFactor:0.92,motion:'STILL',behavior:'careful pace'},{time:160,angleDeg:142,radiusFactor:0.92,motion:'MOVING',behavior:'near platform'},{time:170,angleDeg:67,radiusFactor:0.8,motion:'MOVING',behavior:'short wait'},{time:180,angleDeg:67,radiusFactor:1.08,motion:'STILL',behavior:'nan'}
+  ]}
 };
 /* ===================== 상태/DOM ===================== */
 /* ===================== 상태/DOM ===================== */
@@ -58,6 +84,13 @@ function interp(ent, t){
   if(!b) return polar(ent.frames.at(-1).angleDeg, ent.frames.at(-1).radiusFactor);
   const r=(t-a.time)/(b.time-a.time);
   return polar(a.angleDeg + (b.angleDeg - a.angleDeg)*r, a.radiusFactor + (b.radiusFactor - a.radiusFactor)*r);
+}
+function polar(angleDeg, radiusFactor, cx = 100, cy = 100, R = 80) {
+  const theta = angleDeg * Math.PI / 180;   // 0° right, 90° up (with the -sin below)
+  const r = radiusFactor * R;
+  const x = cx + Math.cos(theta) * r;
+  const y = cy - Math.sin(theta) * r;       // NOTE: minus makes 90° go UP on screen
+  return { x, y };
 }
 function svgToClient(x, y){
   const rect = stage.getBoundingClientRect();
@@ -195,7 +228,7 @@ function renderAerial(){
 
     // Dwell
     if(activeViews.dwellTime && isPerson){
-      const ring = svg('circle',{cx:pos.x, cy:pos.y, r:Math.max(6,dwellSizes[id]/2), fill:'none', stroke:ent.colors[0], 'stroke-width':2});
+      const ring = svg('circle',{cx:pos.x, cy:pos.y, r:Math.max(6,dwellSizes[id]/2), fill:'none', stroke:ent.colors[0], 'stroke-width':0.5});
       g.appendChild(ring);
       addHoverHandlers(ring, pos, ent.hoverText);
       addInvisibleHitCircle(g, pos, ent.hoverText, 12);
@@ -576,14 +609,14 @@ function animateExploded(to){
   explodeRAF = requestAnimationFrame(step);
 }
 
-/* ===================== 시간/드웰/트레일 ===================== */
+/* ===================== 시간/드웰/트레일 ===== */
 function tick(dt){
   Object.entries(rawData).forEach(([id, ent])=>{
     const fr = getFrame(ent, currentTime);
     const state = dwellState[id];
     const still = fr?.motion === 'STILL';
     if(state.lastMotion==='STILL' && fr?.motion==='MOVING') state.diamPx = 10;
-    state.diamPx = still ? state.diamPx + 1*dt : 10;
+    state.diamPx = still ? state.diamPx + 0.5*dt : 10;
     state.lastMotion = fr?.motion || null;
     dwellSizes[id] = state.diamPx;
 
@@ -607,6 +640,24 @@ function setView(v){
   else               animateExploded(0);
 }
 function bindUI(){
+    // === Top-nav Hover Glow ===
+// 한 번만 생성해서 body에 붙임
+// Top-nav hover glow -----------------------------
+const navGlow = document.getElementById('nav-glow');
+document.querySelectorAll('.nav-item .nav-btn').forEach(btn=>{
+  btn.addEventListener('mouseenter', ()=>{
+    const r = btn.getBoundingClientRect();
+    const cx = r.left + r.width/2;
+    const cy = r.top  + r.height/2;
+    navGlow.style.setProperty('--nx', `${cx}px`);
+    navGlow.style.setProperty('--ny', `${cy}px`);
+    navGlow.classList.add('show');
+  });
+  btn.addEventListener('mouseleave', ()=> navGlow.classList.remove('show'));
+});
+
+
+
   document.querySelectorAll('.toggle').forEach(el=>{
     const key = el.dataset.key;
     if(activeViews[key]) el.classList.add('active');
@@ -623,25 +674,7 @@ function bindUI(){
     el.addEventListener('click', ()=> setView(v));
   });
 
-  document.getElementById('btn-about').addEventListener('click', ()=>{
-    overlayTitle.textContent='About';
-    overlayBody.innerHTML = `<p>This visualization captures three minutes in the Providence Train Station waiting room, just before the 4:59 PM train departure.</p>`;
-    overlay.classList.remove('is-hidden');
-  });
-  document.getElementById('btn-key').addEventListener('click', ()=>{
-    overlayTitle.textContent='Key';
-    overlayBody.innerHTML = `
-      <p><strong>Outfit Color:</strong> Gradient dots showing clothing colors</p>
-      <p><strong>Dwell Time:</strong> Expanding circles when people stay still</p>
-      <p><strong>Behaviour:</strong> Text labels describing activities</p>
-      <p><strong>Path:</strong> Lines tracing movement trajectories</p>
-      <p><strong>Companions:</strong> Dogs, bikes, and strollers</p>`;
-    overlay.classList.remove('is-hidden');
-  });
-  overlay.addEventListener('click',(e)=>{ if(e.target===overlay) overlay.classList.add('is-hidden'); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') overlay.classList.add('is-hidden'); });
 
-  window.addEventListener('resize', ()=> render());
 }
 
 /* ===================== 메인 루프 ===================== */
@@ -699,48 +732,4 @@ function loop(ts){
   startPlayback();
 })();
 
-/* ===================== 인트로 비디오 ===================== */
-function setupIntroVideo() {
-  const video = document.getElementById("introVideo");
-
-  // 인트로 재생 시작
-  showVideo = "opening";
-
-  // 자동재생 시도 (정책상 막히면 일단 무음 재생 시도)
-  const tryPlay = async () => {
-    try {
-      await video.play();
-    } catch (err) {
-      console.warn("Autoplay blocked, waiting for user gesture");
-      // iOS 등에서 자동재생이 막히면 첫 클릭 이벤트로 다시 시도
-      const handler = () => {
-        video.play();
-        document.removeEventListener("click", handler);
-      };
-      document.addEventListener("click", handler);
-    }
-  };
-
-  tryPlay();
-
-  // 영상 끝나면 본 앱 실행
-  video.addEventListener("ended", finishIntro);
-
-  // 혹시 로딩 실패 시 안전하게 넘어가도록 fallback
-  video.addEventListener("error", () => {
-    console.warn("Video failed to load, skipping intro.");
-    finishIntro();
-  });
-}
-
-/* ===================== 인트로 종료 후 앱 실행 ===================== */
-function finishIntro() {
-  if (showVideo !== "opening") return;
-  showVideo = "none";
-  const screen = document.getElementById("screen");
-  const app = document.getElementById("app");
-  screen.classList.add("is-hidden");
-  app.classList.remove("is-hidden");
-  startApp(); // 시계 및 인터랙션 시작
-}
 
