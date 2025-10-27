@@ -10,24 +10,28 @@
   --cy: 50%;
   --r: 0px;
 
-  /* 스테이지 위치/크기(한 번에 조절) */
-  --stage-scale: 1.80;     /* 그리드 전체 크기 비율 */
-  --stage-shift-y: 60px;   /* 그리드를 화면 아래로 이동 */
+  /* 동적 그라디언트 색(엔티티별로 JS가 변경) */
+  --hover-c1: rgba(255,250,216,0.90);  /* 중앙 - 쨍 */
+  --hover-c2: rgba(255,250,216,0.55);  /* 중간 */
+  --hover-c3: rgba(255,250,216,0.00);  /* 가장자리 완전 페이드 */
+
+  /* 스테이지 위치/크기 */
+  --stage-scale: 1.80;
+  --stage-shift-y: 60px;
 
   /* 시계 */
   --clock-size: 98px;
   --clock-nudge-y: -6px;
 
-  /* 사이드 패널 Y */
+  /* 사이드 패널 */
   --side-top: 150px;
 
-  /* Exploded View 파라미터 */
-      /* 레이어 간격(px, SVG공간 translateY) */
-  --exp-gap: 32;          /* 숫자만 바꾸면 간격이 변함 (viewBox 단위) */
+  /* Exploded 파라미터 */
+  --exp-gap: 32;
   --exp-target-squash: .22;
 }
 
-/* reset */
+/* reset & 기본 */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -40,29 +44,37 @@ body{
 .stage{
   position:fixed; inset:0;
   width:100vw; height:100vh; display:block;
-  z-index:1;                       /* UI보다 뒤 */
-  pointer-events:none;             /* 기본은 이벤트 차단 */
+  z-index:1;
+  pointer-events:none;
   transform-origin: 50% 50%;
   transform: translateY(var(--stage-shift-y)) scale(var(--stage-scale));
   isolation:isolate;
 }
 #grid-circles, #grid-spokes, #outer-segments{ pointer-events:none; }
-#entities{ pointer-events:auto; }  /* ✅ 엔티티만 인터랙션 허용 */
+#entities{ pointer-events:auto; }
 #entities *{ pointer-events:auto; }
 
 /* ===== 호버 리플 & 텍스트 ===== */
 .hover-overlay{
   position:fixed; inset:0; z-index:20; pointer-events:none;
+  /* ✅ 엔티티별 컬러로 동적 갱신되는 3단 그라디언트 */
   background: radial-gradient(
     circle at var(--cx) var(--cy),
-    rgba(255,251,224,0.30) 0%,
-    rgba(255,251,224,0.15) 40%,
-    rgba(255,251,224,0.00) 70%
+    var(--hover-c1) 0%,
+    var(--hover-c2) 60%,
+    var(--hover-c3) 100%
   );
   clip-path: circle(var(--r) at var(--cx) var(--cy));
   opacity:0; transition: clip-path 600ms ease, opacity 600ms ease;
 }
-.hover-overlay.active{ --r:160vmax; opacity:1; }
+
+#hover-overlay span {
+  transform: scale(0.5);
+  transform-origin: center;
+  white-space: pre; /* 줄바꿈 방지, 타자기 효과 자연스럽게 */
+}
+.hover-overlay.active{ --r:120vmax; opacity:1; }
+
 .hover-text{
   position:fixed; left:var(--cx); top:var(--cy);
   transform: translate(-50%,-120%);
@@ -73,10 +85,7 @@ body{
 .hover-overlay.active .hover-text{ opacity:1; }
 
 /* ===== Opening/Closing ===== */
-.screen{
-  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-  background:var(--bg); z-index:1000;
-}
+.screen{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:var(--bg); z-index:1000; }
 .screen-inner{text-align:center}
 .screen-title{font-size:48px}
 .screen-sub{font-size:18px; margin-top:20px; opacity:.8}
@@ -96,135 +105,57 @@ body{
   font-size:var(--clock-size); margin:0; font-weight:700; text-align:center; flex:1;
   transform: translateY(var(--clock-nudge-y));
 }
-.top-nav{ display:flex; gap:47px; font-size:21px }
-.navbtn{
-  background:transparent; border:none; color:var(--fg);
-  cursor:pointer; font-size:21px; padding:6px 4px;
-}
-.navbtn:focus-visible{ outline:2px dashed var(--fg); outline-offset:2px }
-
-/* 좌/우 패널 */
-.left,.right{
-  position:fixed; top:var(--side-top); width:189px; z-index:30; background:transparent;
-}
-.left{ left:80px; } .right{ right:80px; }
-.side-title{ font-size:21px; font-weight:200; margin:0 0 6px 0 }
-.toggle,.view-toggle{
-  display:flex; align-items:center; gap:12px; padding:8px 0; cursor:pointer; user-select:none; color:var(--fg);
-}
-.toggle .dot,.view-toggle .dot{
-  width:16px; height:16px; border-radius:50%;
-  border:1px solid var(--fg); background:transparent; flex:0 0 auto;
-}
-.toggle.active .dot,.view-toggle.active .dot{ background:var(--fg) }
-.toggle .label,.view-toggle .label{ font-size:21px; font-weight:200 }
-
-/* 모달 */
-.overlay{
-  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(135deg, rgba(83,43,47,.95), rgba(255,251,224,.15));
-  z-index:999; cursor:pointer;
-}
-.overlay-card{ cursor:auto; max-width:600px; padding:40px; font-size:21px; text-align:center; }
-.overlay-title{ font-size:48px; margin:0 0 20px 0 }
-.overlay-body p{ margin:0 0 .5em 0 }
-
-/* Exploded 레이어 강/약 */
-.exploded-dim { opacity: var(--exp-dim); }
-.exploded-strong { opacity: 1; }
-
-/* 점선/분절 스타일(Exploded용) */
-.exp-grid-dot { stroke:none; fill:var(--grid); opacity:.45; }
-.exp-segment  { stroke:var(--grid-muted); stroke-width:8; stroke-linecap:round; fill:none; opacity:.9; }
-
-/* 의상 팔레트용 약간의 블러 */
-.exp-blur { filter: url(#exp-blur); }
-
-/* Aerial에서 쓰는 기본 그리드는 Exploded에선 숨긴다 */
-.stage.exploded #grid-circles,
-.stage.exploded #grid-spokes,
-.stage.exploded #outer-segments { display:none; }
-
-/* Exploded로 생성되는 레이어 공통 */
-.exp-layer{
-  /* SVG에서 CSS 트랜스폼 기준을 뷰박스로 고정 */
-  transform-box: view-box;
-  transform-origin: 0 0;     /* 아래서 명시적으로 중심 이동해서 스케일링 */
-}
-
-/* 시계와 겹치지 않도록 위쪽 마진을 확보하기 위해 stage 자체도 조금 내림(필요시) */
-.stage.exploded {
-  transform: translateY(0) scale(var(--stage-scale)); /* 기존 stage-scale 그대로 */
-}
-
-/* 디밍/스큐 관련 이전 클래스가 있었다면 무력화 */
-.exploded-dim, .exploded-strong { opacity: 1 !important; }
-
-/* 전환 중 GPU 힌트 */
-.stage, .exp-layer, .aerial-wrap { will-change: transform, opacity; }
-
-/* (선택) 전환 중 인터랙션 잠깐 막기 */
-.body--transitioning #entities { pointer-events:none; }
-
-
-/* === Top-nav Hover Glow (About/Key 전용, 쨍한 버전) === */
-/* === Top-nav Hover Glow (자연스러운 가장자리 페이드) === */
-/* === Top-nav Hover Glow (경계 0%까지 자연 페이드) === */
-/* 헤더 버튼 호버용 글로우 레이어 */
-/* nav 컨테이너 */
 .top-nav { display:flex; gap:32px; align-items:center; }
-
-/* 각 버튼+설명 묶음 */
 .nav-item { position:relative; }
-
-/* 버튼 기본/호버 색 */
 .nav-btn{
   background:none; border:0; cursor:pointer;
   font:600 1rem/1 "General Sans", sans-serif;
   color:#fffbe0; transition:color .25s ease;
 }
 .nav-item:hover .nav-btn{ color:#532b2f; }
-
-/* 설명 툴팁: 기본 숨김, hover 시 보이기 */
 .desc{
-   position: fixed;            /* 화면 기준 중앙 배치 */
-  top: 50%;
-  left: 50%;
+  position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%) translateY(10px);
-  width: auto;
-  max-width: 480px;
-  text-align: center;
-  font-family: 'General Sans', sans-serif;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #532b2f;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  background: none;           /* 🔥 배경 박스 제거 */
-  box-shadow: none;           /* 그림자 제거 */
-  padding: 0;    
+  width: auto; max-width: 480px; text-align: center;
+  font-family:'General Sans',sans-serif; font-size: 1rem; line-height: 1.6; color: #532b2f;
+  opacity: 0; pointer-events: none; transition: opacity .4s ease, transform .4s ease;
+  background: none; box-shadow: none; padding: 0;
 }
-.nav-item:hover .desc {
-  opacity: 1;
-  transform: translate(-50%, -50%) translateY(0);
-}
+.nav-item:hover .desc { opacity:1; transform: translate(-50%, -50%) translateY(0); }
 
-/* 헤더 버튼 호버용 글로우 레이어(가득 퍼지고 가장자리 0%) */
+/* Top-nav 전용 글로우 */
 .nav-glow{
   position:fixed; inset:0; z-index:25; pointer-events:none;
   --nx:50%; --ny:50%; --r:0vmax;
   background: radial-gradient(
     circle at var(--nx) var(--ny),
     rgba(255,250,216,0.96) 0%,
-    rgba(255,250,216,0.94) 12%,
     rgba(255,250,216,0.90) 28%,
-    rgba(255,250,216,0.78) 48%,
     rgba(255,250,216,0.56) 70%,
-    rgba(255,250,216,0.22) 90%,
     rgba(255,250,216,0.00) 100%
   );
   clip-path:circle(var(--r) at var(--nx) var(--ny));
   opacity:0; transition:clip-path .5s ease, opacity .5s ease;
 }
 .nav-glow.show{ --r:1000vmax; opacity:1; }
+
+/* 좌/우 패널 */
+.left,.right{ position:fixed; top:var(--side-top); width:189px; z-index:30; background:transparent; }
+.left{ left:80px; } .right{ right:80px; }
+.side-title{ font-size:21px; font-weight:200; margin:0 0 6px 0 }
+.toggle,.view-toggle{ display:flex; align-items:center; gap:12px; padding:8px 0; cursor:pointer; user-select:none; color:var(--fg); }
+.toggle .dot,.view-toggle .dot{ width:16px; height:16px; border-radius:50%; border:1px solid var(--fg); background:transparent; flex:0 0 auto; }
+.toggle.active .dot,.view-toggle.active .dot{ background:var(--fg) }
+.toggle .label,.view-toggle .label{ font-size:21px; font-weight:200 }
+
+/* Exploded 전용 보조 스타일 */
+.stage.exploded #grid-circles,
+.stage.exploded #grid-spokes,
+.stage.exploded #outer-segments { display:none; }
+.exp-grid-dot { stroke:none; fill:var(--grid); opacity:.45; }
+.exp-segment  { stroke:var(--grid-muted); stroke-width:8; stroke-linecap:round; fill:none; opacity:.9; }
+.exp-layer{ transform-box: view-box; transform-origin: 0 0; }
+.stage.exploded { transform: translateY(0) scale(var(--stage-scale)); }
+.exploded-dim, .exploded-strong { opacity: 1 !important; }
+.stage, .exp-layer, .aerial-wrap { will-change: transform, opacity; }
+.body--transitioning #entities { pointer-events:none; }

@@ -16,6 +16,19 @@ const rawData = { /* ── (사용자 데이터 그대로) ── */
 };
 /* ===================== 상태/DOM ===================== */
 /* ===================== 상태/DOM ===================== */
+/* =========================================================
+   (중요) 이 파일은 rawData(엔티티 데이터)가 전역에 이미
+   로드되어 있다고 가정합니다.
+   예: <script src="data.js"></script> 뒤에 이 파일을 로드
+   ========================================================= */
+
+/* ===================== 상태/DOM ===================== */
+/* =========================================================
+   이 파일은 rawData(엔티티 데이터)가 전역에 이미 로드되어 있다고 가정
+   예: <script src="data.js"></script> 뒤에 이 파일 로드
+   ========================================================= */
+
+/* ===================== 상태/DOM ===================== */
 let currentTime = 0;
 let showVideo = 'opening';
 let isBlinking = false;
@@ -32,9 +45,6 @@ const app = document.getElementById('app');
 const screen = document.getElementById('screen');
 const screenTitle = document.getElementById('screen-title');
 const clockEl = document.getElementById('clock');
-const overlay = document.getElementById('overlay');
-const overlayTitle = document.getElementById('overlay-title');
-const overlayBody = document.getElementById('overlay-body');
 
 const stage = document.getElementById('stage');
 const gridCircles = document.getElementById('grid-circles');
@@ -74,12 +84,47 @@ function readCssNumber(varName, fallback){
 const lerp = (a,b,t)=> a + (b-a)*t;
 const easeInOut = t => t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
 
-/* ===================== 공통 Hover 헬퍼 ===================== */
-function addHoverHandlers(el, pos, text){
+/* ===== 색 변환 & 오버레이 컬러 세팅 ===== */
+function hexToRgba(c, a){
+  if(!c) return `rgba(255,255,255,${a})`;
+  if(c.startsWith('rgba')||c.startsWith('rgb')) return c;
+  let r=255,g=255,b=255, s=c.replace('#','').trim();
+  if(s.length===3){ r=parseInt(s[0]+s[0],16); g=parseInt(s[1]+s[1],16); b=parseInt(s[2]+s[2],16); }
+  else if(s.length>=6){ r=parseInt(s.slice(0,2),16); g=parseInt(s.slice(2,4),16); b=parseInt(s.slice(4,6),16); }
+  return `rgba(${r},${g},${b},${a})`;
+}
+function setHoverGradientColors(colors){
+  const c1 = hexToRgba(colors?.[0], 0.95);
+  const c2 = hexToRgba(colors?.[1], 0.60);
+  const c3 = hexToRgba(colors?.[2], 0.00);
+  const root = document.documentElement.style;
+  root.setProperty('--hover-c1', c1);
+  root.setProperty('--hover-c2', c2);
+  root.setProperty('--hover-c3', c3);
+}
+
+/* ===================== 호버 리플/코멘트 ===================== */
+function setRippleCenter(px, py){
+  hoverOverlay.style.setProperty('--cx', `${px}px`);
+  hoverOverlay.style.setProperty('--cy', `${py}px`);
+}
+function openComment(px, py, text){
+  setRippleCenter(px, py);
+  hoverText.textContent = text || '';
+  hoverOverlay.classList.add('active');
+}
+function closeComment(){
+  hoverOverlay.classList.remove('active');
+  hoverText.textContent = '';
+}
+
+/* 공통 Hover 헬퍼: ✅ colors 포함 */
+function addHoverHandlers(el, pos, text, colors){
   el.classList.add('entity-hit');
   el.style.pointerEvents = 'auto';
   el.addEventListener('mouseenter', ()=>{
     const {cx, cy} = svgToClient(pos.x, pos.y);
+    setHoverGradientColors(colors);
     openComment(cx, cy, text);
   });
   el.addEventListener('mousemove', ()=>{
@@ -88,12 +133,27 @@ function addHoverHandlers(el, pos, text){
   });
   el.addEventListener('mouseleave', closeComment);
 }
-function addInvisibleHitCircle(parentG, pos, text, r=12){
+function addInvisibleHitCircle(parentG, pos, text, colors, r=12){
   const hit = svg('circle', { cx:pos.x, cy:pos.y, r, fill:'transparent' });
-  addHoverHandlers(hit, pos, text);
+  addHoverHandlers(hit, pos, text, colors);
   parentG.appendChild(hit);
 }
 
+/* ===== 호버 가드 ===== */
+let HOVER_GUARDS_WIRED = false;
+function wireHoverGuardsOnce(){
+  if (HOVER_GUARDS_WIRED) return;
+  HOVER_GUARDS_WIRED = true;
+  stage.addEventListener('mouseleave', closeComment);
+  window.addEventListener('blur', closeComment);
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) closeComment(); });
+  stage.addEventListener('touchend', closeComment, {passive:true});
+  stage.addEventListener('pointercancel', closeComment);
+  document.addEventListener('pointermove', (e)=>{
+    const onHit = e.target && e.target.classList && e.target.classList.contains('entity-hit');
+    if(!onHit) closeComment();
+  });
+}
 
 /* ===================== 그리드(항공) ===================== */
 let GRAD_SEQ = 0;
@@ -124,37 +184,9 @@ function makeGrid(){
   });
 }
 
-/* ===================== 호버 리플/코멘트 ===================== */
-function setRippleCenter(px, py){
-  hoverOverlay.style.setProperty('--cx', `${px}px`);
-  hoverOverlay.style.setProperty('--cy', `${py}px`);
-}
-function openComment(px, py, text){
-  setRippleCenter(px, py);
-  hoverText.textContent = text || '';
-  hoverOverlay.classList.add('active');
-}
-function closeComment(){
-  hoverOverlay.classList.remove('active');
-  hoverText.textContent = '';
-}
-let HOVER_GUARDS_WIRED = false;
-function wireHoverGuardsOnce(){
-  if (HOVER_GUARDS_WIRED) return;
-  HOVER_GUARDS_WIRED = true;
-  stage.addEventListener('mouseleave', closeComment);
-  window.addEventListener('blur', closeComment);
-  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) closeComment(); });
-  stage.addEventListener('touchend', closeComment, {passive:true});
-  stage.addEventListener('pointercancel', closeComment);
-  document.addEventListener('pointermove', (e)=>{
-    const onHit = e.target && e.target.classList && e.target.classList.contains('entity-hit');
-    if(!onHit) closeComment();
-  });
-}
-
 /* ===================== 엔티티 ===================== */
 function initEntities(){
+  if(typeof rawData!=='object'){ console.warn('rawData가 없습니다. data.js를 먼저 로드하세요.'); return; }
   Object.keys(rawData).forEach(id=>{
     trails[id]=[];
     dwellState[id]={diamPx:10,lastMotion:null};
@@ -190,23 +222,24 @@ function renderAerial(){
       g.appendChild(dot);
       dot.appendChild(svg('animate',{ attributeName:'r', values:'7;9;7', dur:'1.5s', repeatCount:'indefinite' }));
       dot.appendChild(svg('animate',{ attributeName:'opacity', values:'1;0.7;1', dur:'1.5s', repeatCount:'indefinite' }));
-      addHoverHandlers(dot, pos, ent.hoverText);
+      addHoverHandlers(dot, pos, ent.hoverText, ent.colors);
+      addInvisibleHitCircle(g, pos, ent.hoverText, ent.colors, 12);
     }
 
     // Dwell
     if(activeViews.dwellTime && isPerson){
       const ring = svg('circle',{cx:pos.x, cy:pos.y, r:Math.max(6,dwellSizes[id]/2), fill:'none', stroke:ent.colors[0], 'stroke-width':2});
       g.appendChild(ring);
-      addHoverHandlers(ring, pos, ent.hoverText);
-      addInvisibleHitCircle(g, pos, ent.hoverText, 12);
+      addHoverHandlers(ring, pos, ent.hoverText, ent.colors);
+      addInvisibleHitCircle(g, pos, ent.hoverText, ent.colors, 12);
     }
 
     // Behaviour
     if(activeViews.behaviour && isPerson && frame?.behavior){
       const t = svg('text',{x:pos.x, y:pos.y-8, fill:ent.colors[0], 'font-size':3.5, 'text-anchor':'middle'});
       t.textContent = frame.behavior; g.appendChild(t);
-      addHoverHandlers(t, pos, ent.hoverText);
-      addInvisibleHitCircle(g, pos, ent.hoverText, 10);
+      addHoverHandlers(t, pos, ent.hoverText, ent.colors);
+      addInvisibleHitCircle(g, pos, ent.hoverText, ent.colors, 10);
     }
 
     // Path
@@ -214,13 +247,13 @@ function renderAerial(){
       const d = trails[id].map((p,i)=> `${i===0?'M':'L'} ${p.x} ${p.y}`).join(' ');
       const path = svg('path',{d, fill:'none', stroke:ent.colors[0], 'stroke-width':0.8, opacity:0.6});
       g.appendChild(path);
-      addHoverHandlers(path, pos, ent.hoverText);
-      addInvisibleHitCircle(g, pos, ent.hoverText, 10);
+      addHoverHandlers(path, pos, ent.hoverText, ent.colors);
+      addInvisibleHitCircle(g, pos, ent.hoverText, ent.colors, 10);
     }
   });
 }
 
-/* ===================== Exploded (애니메이션: 중앙→상단, 아래로 펼침) ===================== */
+/* ===================== Exploded (중앙→상단 리프트, progress 방식) ===================== */
 function buildExplodedGrid(g){
   [20,40,60,80].forEach(r=>{
     g.appendChild(svg('circle',{cx:100,cy:100,r,fill:'none',stroke:'var(--grid)','stroke-width':0.25,opacity:0.35,'stroke-dasharray':'1 2'}));
@@ -238,36 +271,25 @@ function buildExplodedGrid(g){
   });
 }
 
-/**
- * progress p: 0 → 1
- * - p=0  : 한 화면(Aerial) 중앙에 모든 레이어가 겹침(스케일Y=1, 오프셋=0)
- * - p→1  : 중앙 레이어(Outfit)가 위로 liftUp, 나머지 4개가 gap 간격으로 아래로 내려감
- * - 스케일Y는 1 → squash 로 보간(순수 Y축 압축, 회전/스큐 없음)
- */
 function renderExploded(p){
   clear(entitiesLayer);
 
-  // CSS 변수 → 숫자 (없으면 기본값)
   const squashTarget = readCssNumber('--exp-target-squash', 0.42);
   const gapTarget    = readCssNumber('--exp-gap',          26);
-  const liftTarget   = readCssNumber('--exp-lift',         gapTarget); // 기본: gap와 동일
+  const liftTarget   = readCssNumber('--exp-lift',         gapTarget);
 
   const k = easeInOut(p);
-
-  // Aerial 그리드 숨김/표시
   if (k > 0.02) stage.classList.add('exploded'); else stage.classList.remove('exploded');
 
   const layers = ['outfitColor','dwellTime','behaviour','path','companions'];
   const cx=100, cy=100;
 
-  // 최종 배치 파라미터
-  const liftUp = liftTarget;            // 최상단(중앙 레이어)이 올라갈 양
-  const gap    = gapTarget;             // 레이어 간 간격
-  const baseY  = -liftUp;               // 최상단 레이어 중심 Y
+  const liftUp = liftTarget;
+  const gap    = gapTarget;
+  const baseY  = -liftUp;
   const scaleY = lerp(1, squashTarget, k);
 
   layers.forEach((feature, idx)=>{
-    // [-liftUp, -liftUp+gap, -liftUp+2*gap, ...] 로 배치 → 과도한 큰 빈칸 제거
     const targetOffset = baseY + idx * gap;
     const offsetY = lerp(0, targetOffset, k);
 
@@ -278,12 +300,10 @@ function renderExploded(p){
     );
     entitiesLayer.appendChild(layerG);
 
-    // 얇은 exploded 전용 그리드 (페이드 인)
     const gridG = svg('g', { opacity: lerp(0, 1, k) });
     buildExplodedGrid(gridG);
     layerG.appendChild(gridG);
 
-    // --- 엔티티 그리기 (기존 그대로) ---
     const entsG = svg('g', {}); layerG.appendChild(entsG);
 
     Object.entries(rawData).forEach(([id, ent])=>{
@@ -296,255 +316,46 @@ function renderExploded(p){
       if (feature==='outfitColor' && isPerson && activeViews.outfitColor){
         const gradId = `grad-ex-${++GRAD_SEQ}`;
         const grad = svg('radialGradient', { id:gradId });
-        [['0%',0],['50%',1],['100%',2]].forEach(([off,i])=>{
-          grad.appendChild(svg('stop',{offset:off,'stop-color':ent.colors[i]}));
-        });
+        [['0%',0],['50%',1],['100%',2]].forEach(([off,i])=> grad.appendChild(svg('stop',{offset:off,'stop-color':ent.colors[i]})));
         defsRoot.appendChild(grad);
         const c = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:`url(#${gradId})`, opacity:1});
         entsG.appendChild(c);
-        addHoverHandlers(c, pos, ent.hoverText);
+        addHoverHandlers(c, pos, ent.hoverText, ent.colors);
+        addInvisibleHitCircle(entsG, pos, ent.hoverText, ent.colors, 12);
       }
 
       if (feature==='dwellTime' && isPerson && activeViews.dwellTime){
         const r = Math.max(6, dwellSizes[id]/2);
         const ring = svg('circle',{cx:pos.x, cy:pos.y, r, fill:'none', stroke:ent.colors[0], 'stroke-width':2, opacity:1});
         entsG.appendChild(ring);
-        addHoverHandlers(ring, pos, ent.hoverText);
-        addInvisibleHitCircle(entsG, pos, ent.hoverText, 12);
+        addHoverHandlers(ring, pos, ent.hoverText, ent.colors);
+        addInvisibleHitCircle(entsG, pos, ent.hoverText, ent.colors, 12);
       }
 
       if (feature==='behaviour' && isPerson && activeViews.behaviour && frame?.behavior){
         const t = svg('text',{x:pos.x, y:pos.y-8, fill:ent.colors[0], 'font-size':3.5, 'text-anchor':'middle', opacity:1});
         t.textContent = frame.behavior; entsG.appendChild(t);
-        addHoverHandlers(t, pos, ent.hoverText);
-        addInvisibleHitCircle(entsG, pos, ent.hoverText, 10);
+        addHoverHandlers(t, pos, ent.hoverText, ent.colors);
+        addInvisibleHitCircle(entsG, pos, ent.hoverText, ent.colors, 10);
       }
 
       if (feature==='path' && isPerson && activeViews.path && trails[id]?.length>1){
         const d = trails[id].map((p,i)=> `${i===0?'M':'L'} ${p.x} ${p.y}`).join(' ');
         const path = svg('path',{d, fill:'none', stroke:ent.colors[0], 'stroke-width':0.8, opacity:1});
         entsG.appendChild(path);
-        addHoverHandlers(path, pos, ent.hoverText);
-        addInvisibleHitCircle(entsG, pos, ent.hoverText, 10);
+        addHoverHandlers(path, pos, ent.hoverText, ent.colors);
+        addInvisibleHitCircle(entsG, pos, ent.hoverText, ent.colors, 10);
       }
 
       if (feature==='companions' && isComp && activeViews.companions){
         const c = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:ent.colors[2], opacity:1});
         entsG.appendChild(c);
-        addHoverHandlers(c, pos, ent.hoverText);
+        addHoverHandlers(c, pos, ent.hoverText, ent.colors);
+        addInvisibleHitCircle(entsG, pos, ent.hoverText, ent.colors, 12);
       }
     });
   });
 }
-/* =========================================================
-   부드러운 전환용 레이어/상태
-   ========================================================= */
-let kExplode = 0;                 // 0=aerial, 1=exploded
-let targetK  = 0;
-let rafId    = null;
-let transitioning = false;
-
-const root = document.documentElement;
-
-const WRAPS = {
-  aerial: null,     // <g class="aerial-wrap">
-  exploded: null,   // <g class="exploded-wrap"> (안에 exp-layer 5개)
-  layers: []        // [ {g, gridG, entsG}, ... ]
-};
-
-/* 한번만 만든다 */
-function buildAerialOnce(){
-  if (WRAPS.aerial) return;
-  WRAPS.aerial = svg('g', { class:'aerial-wrap' });
-  // 기존 aerial 그리드/엔티티 그룹을 aerial-wrap 안으로 옮겨준다
-  const gridG = svg('g', {});           // 기본 그리드
-  gridG.appendChild(gridCircles);       // 기존 요소를 이동
-  gridG.appendChild(gridSpokes);
-  gridG.appendChild(outerSegments);
-
-  const entsG = entitiesLayer;          // 기존 entities 레이어 그대로 사용
-  WRAPS.aerial.appendChild(gridG);
-  WRAPS.aerial.appendChild(entsG);
-
-  stage.appendChild(WRAPS.aerial);
-}
-
-function buildExplodedOnce(){
-  if (WRAPS.exploded) return;
-
-  WRAPS.exploded = svg('g', { class:'exploded-wrap' });
-  stage.appendChild(WRAPS.exploded);
-
-  WRAPS.layers.length = 0;
-  const cx=100, cy=100;
-  for (let i=0;i<5;i++){
-    const g = svg('g', { class:'exp-layer', 'data-layer':String(i) });
-
-    // 얇은 그리드(점선 원/스포크 + 세그먼트)
-    const gridG = svg('g', {});
-    buildExplodedGrid(gridG);
-    g.appendChild(gridG);
-
-    // 엔티티 표시 전용 그룹 (전환 중에도 DOM 유지)
-    const entsG = svg('g', { class:'exp-ents' });
-    g.appendChild(entsG);
-
-    // 초깃값: aerial과 동일한 위치/스케일(=수직 압축 1)
-    g.setAttribute('transform', `translate(${cx} ${cy}) scale(1 1) translate(${-cx} ${-cy})`);
-
-    WRAPS.exploded.appendChild(g);
-    WRAPS.layers.push({ g, gridG, entsG });
-  }
-
-  // 초기엔 감춰둠
-  WRAPS.exploded.style.display = 'none';
-}
-
-/* 전환 시 transform만 갱신 */
-function applyExplodedTransforms(k){
-  const squashTarget = readCssNumber('--exp-target-squash', 0.42);
-  const gap          = readCssNumber('--exp-gap', 26);
-  const lift         = readCssNumber('--exp-lift', gap);
-
-  const cx=100, cy=100;
-  const baseY  = -lift;
-  const scaleY = lerp(1, squashTarget, k);
-
-  WRAPS.layers.forEach((L, idx)=>{
-    const offsetY = (baseY + idx*gap) * k;   // k==0이면 0, k==1이면 목표 위치
-    L.g.setAttribute(
-      'transform',
-      `translate(0 ${offsetY}) translate(${cx} ${cy}) scale(1 ${scaleY}) translate(${-cx} ${-cy})`
-    );
-    // 전환 동안 그리드는 서서히 나타남
-    L.gridG.setAttribute('opacity', String(lerp(0, 1, k)));
-  });
-}
-
-/* 엔티티를 한 번만 채워 넣고, 위치만 업데이트 */
-function populateExplodedEntitiesOnce(){
-  // 이미 채워져 있으면 스킵
-  if (WRAPS.layers[0]?.entsG.childNodes.length) return;
-
-  // 데이터별로 필요한 feature에 맞춰 5층 모두에 배치
-  //   - outfitColor : 사람만
-  //   - dwellTime   : 사람만(원)
-  //   - behaviour   : 사람만(텍스트)
-  //   - path        : 사람만(경로)
-  //   - companions  : 동반자만
-  const features = ['outfitColor','dwellTime','behaviour','path','companions'];
-
-  Object.entries(rawData).forEach(([id, ent])=>{
-    // id별 공용 hover 텍스트 핸들
-    const addHover = (node, pos, text)=>{
-      node.classList.add('entity-dot');
-      node.addEventListener('mouseenter', ()=>{ const {cx,cy}=svgToClient(pos.x,pos.y); openComment(cx,cy,text); });
-      node.addEventListener('mousemove',  ()=>{ const {cx,cy}=svgToClient(pos.x,pos.y); setRippleCenter(cx,cy); });
-      node.addEventListener('mouseleave', closeComment);
-    };
-
-    features.forEach((feat, layerIdx)=>{
-      const L = WRAPS.layers[layerIdx].entsG;
-      const pos = interp(ent, currentTime) || {x:100,y:100};
-
-      if (feat==='outfitColor' && ent.type==='person'){
-        const gradId = `grad-ex-${id}`;
-        if (!document.getElementById(gradId)){
-          const grad = svg('radialGradient', { id:gradId });
-          [['0%',0],['50%',1],['100%',2]].forEach(([off,i])=>{
-            grad.appendChild(svg('stop',{offset:off,'stop-color':ent.colors[i]}));
-          });
-          defsRoot.appendChild(grad);
-        }
-        const dot = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:`url(#grad-ex-${id})`});
-        L.appendChild(dot);
-        addHover(dot, pos, ent.hoverText);
-      }
-
-      if (feat==='dwellTime' && ent.type==='person'){
-        const ring = svg('circle',{cx:pos.x, cy:pos.y, r:8, fill:'none', stroke:ent.colors[0], 'stroke-width':2});
-        L.appendChild(ring);
-        addHover(ring, pos, ent.hoverText);
-      }
-
-      if (feat==='behaviour' && ent.type==='person'){
-        const t = svg('text',{x:pos.x, y:pos.y-8, fill:ent.colors[0], 'font-size':3.5, 'text-anchor':'middle'});
-        L.appendChild(t);
-        addHover(t, pos, ent.hoverText);
-      }
-
-      if (feat==='path' && ent.type==='person'){
-        const path = svg('path',{d:`M ${pos.x} ${pos.y}`, fill:'none', stroke:ent.colors[0], 'stroke-width':0.8});
-        L.appendChild(path);
-        addHover(path, pos, ent.hoverText);
-      }
-
-      if (feat==='companions' && ent.type==='companion'){
-        const c = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:ent.colors[2]});
-        L.appendChild(c);
-        addHover(c, pos, ent.hoverText);
-      }
-    });
-  });
-}
-
-/* 전환 애니메이션(양방향) */
-function smoothToView(view){
-  targetK = (view==='exploded') ? 1 : 0;
-  if (rafId) cancelAnimationFrame(rafId);
-
-  // 준비: 두 씬 모두 만들어 두고 보이게
-  buildAerialOnce();
-  buildExplodedOnce();
-  populateExplodedEntitiesOnce();
-
-  WRAPS.aerial.style.display   = '';
-  WRAPS.exploded.style.display = '';
-
-  transitioning = true;
-  document.body.classList.add('body--transitioning');
-
-  const startK = kExplode;
-  const t0 = performance.now();
-  const DUR = 600;  // 전환 시간(ms)
-
-  const ease = (t)=> t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
-
-  const step = (now)=>{
-    const u = Math.min(1, (now - t0)/DUR);
-    kExplode = startK + (targetK - startK) * ease(u);
-
-    // 씬 노출/불투명도: 겹치지 않고 부드럽게
-    WRAPS.aerial.style.opacity   = String(1 - kExplode);
-    WRAPS.exploded.style.opacity = String(kExplode);
-
-    // 레이어 기하 보간
-    applyExplodedTransforms(kExplode);
-
-    if (u < 1){
-      rafId = requestAnimationFrame(step);
-    }else{
-      // 마무리: 목표 씬만 남기고 display 최적화
-      kExplode = targetK;
-      WRAPS.aerial.style.opacity   = kExplode===0 ? '1' : '0';
-      WRAPS.exploded.style.opacity = kExplode===1 ? '1' : '0';
-      WRAPS.aerial.style.display   = kExplode===0 ? ''   : 'none';
-      WRAPS.exploded.style.display = kExplode===1 ? ''   : 'none';
-      transitioning = false;
-      document.body.classList.remove('body--transitioning');
-    }
-  };
-  rafId = requestAnimationFrame(step);
-}
-
-/* 외부에서 호출하는 뷰 전환 함수(기존 setView 대체) */
-function setView(v){
-  viewMode = v;
-  document.querySelectorAll('.view-toggle')
-    .forEach(el=> el.classList.toggle('active', el.dataset.view===v));
-  smoothToView(v);
-}
-
 
 /* ===================== 공용 렌더 (progress 기반) ===================== */
 let explodeProgress = 0; // 0..1
@@ -606,24 +417,21 @@ function setView(v){
   if(v==='exploded') animateExploded(1);
   else               animateExploded(0);
 }
+
 function bindUI(){
-    // === Top-nav Hover Glow ===
-// 한 번만 생성해서 body에 붙임
-// Top-nav hover glow -----------------------------
-const navGlow = document.getElementById('nav-glow');
-document.querySelectorAll('.nav-item .nav-btn').forEach(btn=>{
-  btn.addEventListener('mouseenter', ()=>{
-    const r = btn.getBoundingClientRect();
-    const cx = r.left + r.width/2;
-    const cy = r.top  + r.height/2;
-    navGlow.style.setProperty('--nx', `${cx}px`);
-    navGlow.style.setProperty('--ny', `${cy}px`);
-    navGlow.classList.add('show');
+  // Top-nav hover glow
+  const navGlow = document.getElementById('nav-glow');
+  document.querySelectorAll('.nav-item .nav-btn').forEach(btn=>{
+    btn.addEventListener('mouseenter', ()=>{
+      const r = btn.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+      const cy = r.top  + r.height/2;
+      navGlow.style.setProperty('--nx', `${cx}px`);
+      navGlow.style.setProperty('--ny', `${cy}px`);
+      navGlow.classList.add('show');
+    });
+    btn.addEventListener('mouseleave', ()=> navGlow.classList.remove('show'));
   });
-  btn.addEventListener('mouseleave', ()=> navGlow.classList.remove('show'));
-});
-
-
 
   document.querySelectorAll('.toggle').forEach(el=>{
     const key = el.dataset.key;
@@ -640,8 +448,6 @@ document.querySelectorAll('.nav-item .nav-btn').forEach(btn=>{
     const v = el.dataset.view; if(v===viewMode) el.classList.add('active');
     el.addEventListener('click', ()=> setView(v));
   });
-
-
 }
 
 /* ===================== 메인 루프 ===================== */
@@ -698,5 +504,3 @@ function loop(ts){
   setView('aerial');   // 시작은 Aerial
   startPlayback();
 })();
-
-
