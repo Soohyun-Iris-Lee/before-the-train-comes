@@ -300,12 +300,27 @@ function renderExploded(p){
     );
     entitiesLayer.appendChild(layerG);
 
-    const gridG = svg('g', { opacity: lerp(0, 1, k) });
+    // ✅ 토글 상태(켜져있을 때만 그리드 보이기)
+    const featureOn = {
+      outfitColor: activeViews.outfitColor,
+      dwellTime:   activeViews.dwellTime,
+      behaviour:   activeViews.behaviour,
+      path:        activeViews.path,
+      companions:  activeViews.companions
+    }[feature];
+
+    // 얇은 exploded 전용 그리드
+    const gridG = svg('g', {
+      // 기존 페이드 인(lerp) * 토글 여부(0/1)
+      opacity: String( lerp(0, 1, k) * (featureOn ? 1 : 0) )
+    });
     buildExplodedGrid(gridG);
     layerG.appendChild(gridG);
 
-    const entsG = svg('g', {}); layerG.appendChild(entsG);
+    const entsG = svg('g', {}); 
+    layerG.appendChild(entsG);
 
+    // --- 이하 엔티티 렌더는 기존 그대로 ---
     Object.entries(rawData).forEach(([id, ent])=>{
       const pos = interp(ent, currentTime);
       if(!pos) return;
@@ -356,6 +371,7 @@ function renderExploded(p){
     });
   });
 }
+
 
 /* ===================== 공용 렌더 (progress 기반) ===================== */
 let explodeProgress = 0; // 0..1

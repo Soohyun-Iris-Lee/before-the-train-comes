@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "Beretta Sans Trial";
+  src: url("/fonts/BerettaSansTrial-Bold.woff") format("woff");
+  font-weight: 700;       /* 굵기: Bold */
+  font-style: normal;
+  font-display: swap;     /* 폰트 로딩 중 시스템 폰트 먼저 표시 */
+}
 :root{
   --bg:#532b2f;
   --bg-blink:#8B0000;
@@ -54,6 +61,9 @@ body{
 #entities{ pointer-events:auto; }
 #entities *{ pointer-events:auto; }
 
+.stage.exploded {
+  transform: translateY(-30px) scale(var(--stage-scale)) !important;
+}
 /* ===== 호버 리플 & 텍스트 ===== */
 .hover-overlay{
   position:fixed; inset:0; z-index:20; pointer-events:none;
@@ -71,7 +81,6 @@ body{
 #hover-overlay span {
   transform: scale(0.5);
   transform-origin: center;
-  white-space: pre; /* 줄바꿈 방지, 타자기 효과 자연스럽게 */
 }
 .hover-overlay.active{ --r:120vmax; opacity:1; }
 
@@ -101,15 +110,16 @@ body{
 }
 .header-spacer{ width:160px }
 .clock{
-  font-family:"Space Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+ font-family: "Beretta Sans Trial", "Space Mono", monospace;
   font-size:var(--clock-size); margin:0; font-weight:700; text-align:center; flex:1;
   transform: translateY(var(--clock-nudge-y));
 }
-.top-nav { display:flex; gap:32px; align-items:center; }
+.top-nav { display:flex; gap:32px; align-items:center; position: relative;
+  right: 42px;}
 .nav-item { position:relative; }
 .nav-btn{
   background:none; border:0; cursor:pointer;
-  font:600 1rem/1 "General Sans", sans-serif;
+  font:200 1.4rem/1 "General Sans", sans-serif;
   color:#fffbe0; transition:color .25s ease;
 }
 .nav-item:hover .nav-btn{ color:#532b2f; }
