@@ -4,24 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Waiting Room Visualizer</title>
+
+    <!-- 폰트 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=General+Sans:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- 스타일 -->
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <!-- 화면 전체를 덮는 SVG (그리드/엔티티) -->
-<!-- 기존: viewBox="0 0 200 200" -->
-<svg id="stage" class="stage" viewBox="-120 -120 440 440" role="img" aria-label="Waiting room visualization">
-  <defs id="defs-root"></defs>
-  <g id="grid-circles"></g>
-  <g id="grid-spokes"></g>
-  <g id="outer-segments"></g>
-  <g id="entities"></g>
-</svg>
+    <!-- 화면 전체 SVG (그리드/엔티티) -->
+    <svg id="stage" class="stage" viewBox="-120 -120 440 440" role="img" aria-label="Waiting room visualization">
+      <defs id="defs-root"></defs>
+      <g id="grid-circles"></g>
+      <g id="grid-spokes"></g>
+      <g id="outer-segments"></g>
+      <g id="entities"></g>
+    </svg>
 
-    <!-- 호버 리플 & 텍스트 (사람 위치 기준으로 즉시 피어남) -->
+    <!-- 호버 리플 & 텍스트 (엔티티 컬러로 동적 변경) -->
     <div id="hover-overlay" class="hover-overlay" aria-hidden="true">
       <div id="hover-text" class="hover-text"></div>
     </div>
@@ -34,7 +37,10 @@
 <div id="nav-glow" class="nav-glow" aria-hidden="true"></div>
 
 
-    <!-- Opening / Closing -->
+    <!-- 상단 네비 버튼 호버 글로우(설명) -->
+    <div id="nav-glow" class="nav-glow" aria-hidden="true"></div>
+
+    <!-- 오프닝/클로징 스크린 -->
     <div id="screen" class="screen">
       <div class="screen-inner">
         <div id="screen-title" class="screen-title">Opening Animation</div>
@@ -42,42 +48,34 @@
       </div>
     </div>
 
-    <!-- UI (헤더/사이드 패널) -->
+    <!-- UI: 헤더/사이드 -->
     <div id="app" class="app is-hidden" aria-live="polite">
       <header class="site-header">
-  <div class="header-spacer"></div>
-  <h1 id="clock" class="clock">04:56:00</h1>
+        <div class="header-spacer"></div>
+        <h1 id="clock" class="clock">04:56:00</h1>
 
-  <!-- 단 하나의 nav, 버튼과 설명을 같은 컨테이너로 묶음 -->
-  <nav class="top-nav" aria-label="Top Navigation">
-    <div class="nav-item">
-      <button id="btn-about" class="nav-btn" type="button">About</button>
-      <div id="about-desc" class="desc">This visualization captures three minutes in the Providence Train Station waiting room, just before the 4:59 PM train departure.</div>
-    </div>
-    <div class="nav-item">
-      <button id="btn-key" class="nav-btn" type="button">Key</button>
-      <div id="key-desc" class="desc">
-        Outfit Color: colors of clothing<br>
-        Dwell Time: expanding circles when people stay still<br>
-        Behaviour: text labels describing activities<br>
-        Path: trajectory lines<br>
-        Companions: dogs, bikes, strollers
-      </div>
-    </div>
-  </nav>
-</header>
-
-<!-- 오버레이는 하나만 유지 -->
-<div id="hover-overlay" class="hover-overlay" aria-hidden="true">
-  <div id="hover-text" class="hover-text"></div>
-</div>
-
-<!-- Top-nav 전용 글로우 레이어도 하나만 -->
-<div id="nav-glow" class="nav-glow" aria-hidden="true"></div>
-
+        <nav class="top-nav" aria-label="Top Navigation">
+          <div class="nav-item">
+            <button id="btn-about" class="nav-btn" type="button">About</button>
+            <div id="about-desc" class="desc">
+              This visualization captures three minutes in the Providence Train Station waiting room, just before the 4:59 PM train departure.
+            </div>
+          </div>
+          <div class="nav-item">
+            <button id="btn-key" class="nav-btn" type="button">Key</button>
+            <div id="key-desc" class="desc">
+              Outfit Color: colors of clothing<br>
+              Dwell Time: expanding circles when people stay still<br>
+              Behaviour: text labels describing activities<br>
+              Path: trajectory lines<br>
+              Companions: dogs, bikes, strollers
+            </div>
+          </div>
+        </nav>
+      </header>
 
       <section class="left">
-        <h3 class="side-title">Observe people...</h3>
+        <h3 class="side-title">Observe people's...</h3>
         <div class="toggle" data-key="outfitColor"><span class="dot"></span><span class="label">Outfit Color</span></div>
         <div class="toggle" data-key="dwellTime"><span class="dot"></span><span class="label">Dwell Time</span></div>
         <div class="toggle" data-key="behaviour"><span class="dot"></span><span class="label">Behaviour</span></div>
@@ -91,8 +89,7 @@
       </section>
     </div>
 
-
-
+    <!-- 스크립트 (주의: rawData는 별도 파일/블록에서 이미 로드되어 있어야 함) -->
     <script src="script.js"></script>
   </body>
 </html>
