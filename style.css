@@ -1,3 +1,16 @@
+@font-face {
+  font-family: "Beretta Sans Trial";
+  src: url("/fonts/BerettaSansTrial-Bold.woff") format("woff");
+  font-weight: 700;       /* 굵기: Bold */
+  font-style: normal;
+  font-display: swap;     /* 폰트 로딩 중 시스템 폰트 먼저 표시 */
+}
+@font-face {
+  font-family: "PPMori Terrible";
+  src: url("./public/PPMori-Terrible.otf") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
 :root{
   --bg:#532b2f;
   --bg-blink:#8B0000;
@@ -34,6 +47,15 @@ body{
   margin:0; background:var(--bg); color:var(--fg);
   font-family:'PPMori-Regular.woff';
 }
+.bg-video{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+  background:#000;
+}
 .is-hidden{display:none !important}
 
 /* ===== 전체 화면 SVG ===== */
@@ -50,6 +72,9 @@ body{
 #entities{ pointer-events:auto; }  /* ✅ 엔티티만 인터랙션 허용 */
 #entities *{ pointer-events:auto; }
 
+.stage.exploded {
+  transform: translateY(-30px) scale(var(--stage-scale)) !important;
+}
 /* ===== 호버 리플 & 텍스트 ===== */
 .hover-overlay{
   position:fixed; inset:0; z-index:20; pointer-events:none;
@@ -62,7 +87,13 @@ body{
   clip-path: circle(var(--r) at var(--cx) var(--cy));
   opacity:0; transition: clip-path 600ms ease, opacity 600ms ease;
 }
-.hover-overlay.active{ --r:160vmax; opacity:1; }
+
+#hover-overlay span {
+  transform: scale(0.5);
+  transform-origin: center;
+}
+.hover-overlay.active{ --r:120vmax; opacity:1; }
+
 .hover-text{
   position:fixed; left:var(--cx); top:var(--cy);
   transform: translate(-50%,-120%);
@@ -75,14 +106,47 @@ body{
 /* ===== Opening/Closing ===== */
 .screen{
   position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-  background:var(--bg); z-index:1000;
+  background:var(--bg); z-index:1000; overflow:hidden;
 }
-.screen-inner{text-align:center}
+.screen-video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  z-index:0;
+  display:block;
+  background:#000;
+}
+.screen-inner{position:relative; z-index:1; text-align:center}
 .screen-title{font-size:48px}
-.screen-sub{font-size:18px; margin-top:20px; opacity:.8}
+
+/* ===== TEMP: Timeline slider (remove when no longer needed) ===== */
+.temp-timeline-control{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  z-index:1200;
+  padding:12px 16px;
+  border-radius:12px;
+  background:rgba(0,0,0,0.65);
+  color:var(--fg);
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  pointer-events:auto;
+}
+.temp-timeline-control label{
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  font-size:12px;
+}
+.temp-timeline-slider{ width:160px; }
+.temp-timeline-value{ min-width:80px; text-align:right; font-variant-numeric:tabular-nums; }
+/* ===== /TEMP ===== */
 
 /* ===== UI ===== */
-.app{ min-height:100vh; transition:background .2s }
+.app{ min-height:100vh; transition:background .2s; background:var(--bg); }
 .app.blink{ background:var(--bg-blink) }
 
 .site-header{
@@ -92,14 +156,17 @@ body{
 }
 .header-spacer{ width:160px }
 .clock{
-  font-family:"Space Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+ font-family: "Beretta Sans Trial", "Space Mono", monospace;
   font-size:var(--clock-size); margin:0; font-weight:700; text-align:center; flex:1;
   transform: translateY(var(--clock-nudge-y));
 }
-.top-nav{ display:flex; gap:47px; font-size:21px }
-.navbtn{
-  background:transparent; border:none; color:var(--fg);
-  cursor:pointer; font-size:21px; padding:6px 4px;
+.top-nav { display:flex; gap:32px; align-items:center; position: relative;
+  right: 42px;}
+.nav-item { position:relative; }
+.nav-btn{
+  background:none; border:0; cursor:pointer;
+  font:200 1.4rem/1 "General Sans", sans-serif;
+  color:#fffbe0; transition:color .25s ease;
 }
 .navbtn:focus-visible{ outline:2px dashed var(--fg); outline-offset:2px }
 

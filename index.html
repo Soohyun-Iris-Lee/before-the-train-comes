@@ -13,8 +13,18 @@
     <!-- 스타일 -->
     <link rel="stylesheet" href="style.css" />
   </head>
-
+  
   <body>
+    <video
+      id="bg-video"
+      class="bg-video"
+      src="soundbackground.mp4"
+      preload="auto"
+      playsinline
+      autoplay
+      loop
+    ></video>
+
     <!-- 화면 전체 SVG (그리드/엔티티) -->
     <svg id="stage" class="stage" viewBox="-120 -120 440 440" role="img" aria-label="Waiting room visualization">
       <defs id="defs-root"></defs>
@@ -42,11 +52,44 @@
 
     <!-- 오프닝/클로징 스크린 -->
     <div id="screen" class="screen">
+      <video
+        id="opening-video"
+        class="screen-video"
+        src="opening.mp4"
+        playsinline
+        muted
+        preload="auto"
+        aria-hidden="true"
+      ></video>
       <div class="screen-inner">
         <div id="screen-title" class="screen-title">Opening Animation</div>
-        <div class="screen-sub">(Replace with your MP4)</div>
       </div>
+      <video
+        id="closing-video"
+        class="screen-video is-hidden"
+        src="ending.mp4"
+        playsinline
+        muted
+        preload="auto"
+        aria-hidden="true"
+      ></video>
     </div>
+
+    <!-- TEMP: Timeline slider (safe to remove) -->
+    <div id="temp-timeline-control" class="temp-timeline-control" aria-hidden="false">
+      <label for="temp-timeline-slider">Timeline</label>
+      <input
+        id="temp-timeline-slider"
+        class="temp-timeline-slider"
+        type="range"
+        min="0"
+        max="180"
+        step="1"
+        value="0"
+      />
+      <span id="temp-timeline-value" class="temp-timeline-value">04:56:00</span>
+    </div>
+    <!-- /TEMP -->
 
     <!-- UI: 헤더/사이드 -->
     <div id="app" class="app is-hidden" aria-live="polite">

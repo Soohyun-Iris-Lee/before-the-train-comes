@@ -45,6 +45,7 @@ const rawData = { /* ── merged with CSV frames; colors + hoverText preserved
 let currentTime = 0;
 let showVideo = 'opening';
 let isBlinking = false;
+let tempScrubActive = false;
 
 const activeViews = { outfitColor:true, dwellTime:false, behaviour:false, path:false, companions:false };
 let viewMode = 'aerial';               // 'aerial' | 'exploded'
@@ -57,6 +58,9 @@ const dwellSizes = {};
 const app = document.getElementById('app');
 const screen = document.getElementById('screen');
 const screenTitle = document.getElementById('screen-title');
+const screenInner = document.querySelector('.screen-inner');
+const openingVideo = document.getElementById('opening-video');
+const closingVideo = document.getElementById('closing-video');
 const clockEl = document.getElementById('clock');
 const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
@@ -71,19 +75,87 @@ const entitiesLayer = document.getElementById('entities');
 const hoverOverlay = document.getElementById('hover-overlay');
 const hoverText = document.getElementById('hover-text');
 
+/* ===== TEMP timeline slider helpers (remove with temp control) ===== */
+const backgroundVideo = document.getElementById('bg-video');
+const tempTimelineControl = document.getElementById('temp-timeline-control');
+const tempTimelineSlider = document.getElementById('temp-timeline-slider');
+const tempTimelineValue = document.getElementById('temp-timeline-value');
+
+if(tempTimelineControl) tempTimelineControl.classList.add('is-hidden');
+
+function updateTempTimelineUI(force=false){
+  if(tempTimelineSlider && (force || !tempScrubActive)){
+    const sliderVal = Math.max(0, Math.min(180, Math.round(currentTime)));
+    tempTimelineSlider.value = String(sliderVal);
+  }
+  if(tempTimelineValue){
+    tempTimelineValue.textContent = formatTime(Math.floor(currentTime));
+  }
+}
+
+function rebuildStateTo(targetTime){
+  const clamped = Math.min(180, Math.max(0, Number(targetTime) || 0));
+  initEntities();
+  let t = 0;
+  currentTime = 0;
+  while(t < clamped){
+    const next = Math.min(clamped, t + 0.5);
+    currentTime = next;
+    tick(next - t);
+    t = next;
+  }
+  currentTime = clamped;
+  updateTempTimelineUI(true);
+  clockEl.textContent = formatTime(Math.floor(currentTime));
+  lastTS = performance.now();
+  render();
+}
+
+if(tempTimelineSlider){
+  const beginScrub = ()=>{ tempScrubActive = true; clearInterval(secTimer); secTimer = null; };
+  const endScrub = ()=>{
+    if(!tempScrubActive) return;
+    tempScrubActive = false;
+    if(showVideo === 'none' && !secTimer){
+      secTimer = setInterval(runTimerTick, 1000);
+    }
+  };
+  const handleInput = (value)=>{
+    beginScrub();
+    rebuildStateTo(value);
+  };
+  tempTimelineSlider.addEventListener('input', e=> handleInput(e.target.value));
+  tempTimelineSlider.addEventListener('change', e=> { handleInput(e.target.value); endScrub(); });
+  tempTimelineSlider.addEventListener('pointerup', endScrub);
+  tempTimelineSlider.addEventListener('touchend', endScrub);
+  tempTimelineSlider.addEventListener('pointercancel', endScrub);
+  tempTimelineSlider.addEventListener('blur', endScrub);
+  tempTimelineSlider.addEventListener('keyup', e=>{ if(e.key==='Enter' || e.key===' '){ handleInput(e.target.value); endScrub(); } });
+  updateTempTimelineUI(true);
+}
+/* ===== /TEMP timeline slider helpers ===== */
+
 /* ===================== 유틸 ===================== */
 function svg(tag, attrs){ const el=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) el.setAttribute(k, attrs[k]); return el; }
 function clear(node){ while(node.firstChild) node.removeChild(node.firstChild); }
 function formatTime(sec){ const base=4*60+56; const total=base*60+sec; const h=Math.floor(total/3600), m=Math.floor((total%3600)/60), s=total%60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
-function polar(angleDeg, rf){ const t=angleDeg*Math.PI/180, R=80*rf; return {x:100+Math.cos(t)*R, y:100+Math.sin(t)*R, opacity: rf>1? Math.max(0,1-(rf-1)*10):1}; }
 function getFrame(ent, t){ const slot=Math.floor(t/10)*10; return ent.frames.find(f=>f.time===slot) || ent.frames.at(-1); }
+/* EXTRA NOTE: helper returns the interpolated entity position and visibility */
 function interp(ent, t){
   let a=null,b=null;
   for(let i=0;i<ent.frames.length-1;i++){ if(ent.frames[i].time<=t && ent.frames[i+1].time>=t){ a=ent.frames[i]; b=ent.frames[i+1]; break; } }
-  if(!a) return polar(ent.frames[0].angleDeg, ent.frames[0].radiusFactor);
-  if(!b) return polar(ent.frames.at(-1).angleDeg, ent.frames.at(-1).radiusFactor);
+  if(!a){
+    const start = ent.frames[0];
+    return polarWithOpacity(start.angleDeg, start.radiusFactor);
+  }
+  if(!b){
+    const end = ent.frames.at(-1);
+    return polarWithOpacity(end.angleDeg, end.radiusFactor);
+  }
   const r=(t-a.time)/(b.time-a.time);
-  return polar(a.angleDeg + (b.angleDeg - a.angleDeg)*r, a.radiusFactor + (b.radiusFactor - a.radiusFactor)*r);
+  const angle = a.angleDeg + (b.angleDeg - a.angleDeg)*r;
+  const rf    = a.radiusFactor + (b.radiusFactor - a.radiusFactor)*r;
+  return polarWithOpacity(angle, rf);
 }
 function polar(angleDeg, radiusFactor, cx = 100, cy = 100, R = 80) {
   const theta = angleDeg * Math.PI / 180;   // 0° right, 90° up (with the -sin below)
@@ -91,6 +163,12 @@ function polar(angleDeg, radiusFactor, cx = 100, cy = 100, R = 80) {
   const x = cx + Math.cos(theta) * r;
   const y = cy - Math.sin(theta) * r;       // NOTE: minus makes 90° go UP on screen
   return { x, y };
+}
+function polarWithOpacity(angleDeg, radiusFactor){
+  /* EXTRA: provide opacity flag for radiusFactor visibility constraint */
+  const point = polar(angleDeg, radiusFactor);
+  const opacity = radiusFactor > 1 ? 0 : 1;
+  return { ...point, opacity, radiusFactor };
 }
 function svgToClient(x, y){
   const rect = stage.getBoundingClientRect();
@@ -128,7 +206,7 @@ function addInvisibleHitCircle(parentG, pos, text, r=12){
 }
 
 
-/* ===================== 그리드(항공) ===================== */
+/* ===================== Grid 그리드(항공) ===================== */
 let GRAD_SEQ = 0;
 let defsRoot = document.getElementById('defs-root');
 if (!defsRoot) {
@@ -137,26 +215,93 @@ if (!defsRoot) {
   stage.insertBefore(defsRoot, stage.firstChild);
 }
 function makeGrid(){
-  
-  [20,40,60,80].forEach(r=>{
-    const c = svg('circle',{cx:100,cy:100,r,fill:'none',stroke:'var(--grid)','stroke-width':0.3,opacity:0.3});
+  // clear previous grid (prevents duplicates if called again)
+  gridCircles.textContent = '';
+  gridSpokes.textContent  = '';
+  outerSegments.textContent = '';
+
+  const cx = 100, cy = 100;
+  const outerR = 80; // keep original outer radius / viewBox scale
+
+  // (ring proportions) — leave as you set them
+  const rings = [1, 20, 25, 40, 80];
+
+  // Rings (dotted)
+  rings.forEach(r=>{
+    const c = svg('circle', {
+      cx, cy, r,
+      fill: 'none',
+      stroke: 'var(--grid)',
+      'stroke-width': 0.3,
+      'stroke-linecap': 'round',
+      opacity: 1,
+      'stroke-dasharray': '0.3 0.7'
+    });
     gridCircles.appendChild(c);
   });
-  for(let i=0;i<10;i++){
-    const a=i*360/10, t=a*Math.PI/180, x=100+Math.cos(t)*80, y=100+Math.sin(t)*80;
-    gridSpokes.appendChild(svg('line',{x1:100,y1:100,x2:x,y2:y,stroke:'var(--grid)','stroke-width':0.3,opacity:0.3, 'stroke-dasharray': '3 3','vector-effect': 'non-scaling-stroke'}));
-  }
-  [0,60,120,180,240,300].forEach(start=>{
-    const gap=15, s=start+gap/2, e=start+60-gap/2;
-    const sr=s*Math.PI/180, er=e*Math.PI/180;
-    const x1=100+Math.cos(sr)*80, y1=100+Math.sin(sr)*80;
-    const x2=100+Math.cos(er)*80, y2=100+Math.sin(er)*80;
-    outerSegments.appendChild(svg('path',{
-      d:`M ${x1} ${y1} A 80 80 0 0 1 ${x2} ${y2}`,
-      fill:'none', stroke:'var(--grid-muted)', 'stroke-width':8, 'stroke-linecap':'round', opacity:0.8
+
+  // Spokes: 10 slices (dotted) with the LEFT edge of slice #1 at NORTH
+  const SLICE = 360/10;
+  // Using y = cy + Math.sin(theta)*R → 90° is down, so north (up) is 270°
+  const TARGET_DEG = 270;
+  const centerOffset = TARGET_DEG + SLICE; // center of slice #1
+
+  for (let i = 0; i < 10; i++) {
+    const a = centerOffset + i * SLICE; // <-- apply the offset
+    const t = a * Math.PI / 180;
+    const x = cx + Math.cos(t) * outerR;
+    const y = cy + Math.sin(t) * outerR;
+    gridSpokes.appendChild(svg('line', {
+      x1: cx, y1: cy, x2: x, y2: y,
+      stroke: 'var(--grid)',
+      'stroke-width': 0.3,
+      'stroke-linecap': 'round',
+      opacity: 1,
+      'stroke-dasharray': '0.3 0.7'
     }));
+  }
+
+  // (bench placement) ---
+  // Convert your clockwise label (1..10) to a CCW draw angle (degrees),
+  // aligned with the same spoke rotation (centerOffset).
+  const degFor = (label) => (centerOffset - (label + 1) * SLICE + 360) % 360;
+
+  // Draw a bench arc from aStart→aEnd (degrees), with small gap from spoke
+  function arcDeg(aStart, aEnd, gap=6){
+    const s = (aStart + gap) * Math.PI/180;
+    const e = (aEnd   - gap) * Math.PI/180;
+    const x1 = cx + Math.cos(s)*outerR, y1 = cy + Math.sin(s)*outerR;
+    const x2 = cx + Math.cos(e)*outerR, y2 = cy + Math.sin(e)*outerR;
+    outerSegments.appendChild(svg('path',{
+      d:`M ${x1} ${y1} A ${outerR} ${outerR} 0 0 1 ${x2} ${y2}`,
+      fill:'none', stroke:'var(--grid-muted)', 'stroke-width':8, 'stroke-linecap':'round', opacity:1
+    }));
+  }
+
+  // Your benches by spoke labels:
+  // 1–2 (span), 4 (single), 6–7 (span), 9 (single)
+  const benches = [
+    {type:'span', from:1, to:2},
+    {type:'single', at:4},
+    {type:'span', from:6, to:7},
+    {type:'single', at:9},
+  ];
+
+  // width of a single bench along the ring (~90% of one slice)
+  const singleWidth = SLICE * 2.3;
+
+  benches.forEach(b=>{
+    if (b.type === 'span'){
+      const a1 = degFor(b.from), a2 = degFor(b.to);
+      const start = Math.min(a1, a2), end = Math.max(a1, a2);
+      arcDeg(start, end, 6);
+    } else {
+      const c = degFor(b.at);
+      arcDeg(c - singleWidth/2, c + singleWidth/2, );
+    }
   });
 }
+
 
 /* ===================== 호버 리플/코멘트 ===================== */
 function setRippleCenter(px, py){
@@ -200,7 +345,7 @@ function renderAerial(){
   clear(entitiesLayer);
   Object.entries(rawData).forEach(([id, ent])=>{
     const pos = interp(ent, currentTime);
-    if(!pos) return;
+    if(!pos || pos.opacity <= 0){ /* EXTRA: skip any entity whose radiusFactor pushed opacity to 0 */ return; }
 
     const isPerson = ent.type==='person';
     const isComp   = ent.type==='companion';
@@ -208,7 +353,8 @@ function renderAerial(){
     const showComp   = isComp   && activeViews.companions;
     const frame = getFrame(ent, currentTime);
 
-    const g = svg('g', { opacity: pos.opacity });
+    /* EXTRA: apply fractional opacity so points fade instead of popping */
+    const g = svg('g', pos.opacity < 1 ? { opacity: pos.opacity } : {});
     entitiesLayer.appendChild(g);
 
     // Outfit / Companions
@@ -237,7 +383,11 @@ function renderAerial(){
 
     // Behaviour
     if(activeViews.behaviour && isPerson && frame?.behavior){
-      const t = svg('text',{x:pos.x, y:pos.y-8, fill:ent.colors[0], 'font-size':3.5, 'text-anchor':'middle'});
+      const t = svg('text',{x:pos.x, y:pos.y-8, fill:ent.colors[0],
+        'font-size':6,
+        'text-anchor':'middle',
+        'font-family': 'PPMori Terrible, "PP Mori", sans-serif',
+        'font-weight': 400});
       t.textContent = frame.behavior; g.appendChild(t);
       addHoverHandlers(t, pos, ent.hoverText);
       addInvisibleHitCircle(g, pos, ent.hoverText, 10);
@@ -312,20 +462,34 @@ function renderExploded(p){
     );
     entitiesLayer.appendChild(layerG);
 
-    // 얇은 exploded 전용 그리드 (페이드 인)
-    const gridG = svg('g', { opacity: lerp(0, 1, k) });
+    // ✅ 토글 상태(켜져있을 때만 그리드 보이기)
+    const featureOn = {
+      outfitColor: activeViews.outfitColor,
+      dwellTime:   activeViews.dwellTime,
+      behaviour:   activeViews.behaviour,
+      path:        activeViews.path,
+      companions:  activeViews.companions
+    }[feature];
+
+    // 얇은 exploded 전용 그리드
+    const gridG = svg('g', {
+      // 기존 페이드 인(lerp) * 토글 여부(0/1)
+      opacity: String( lerp(0, 1, k) * (featureOn ? 1 : 0) )
+    });
     buildExplodedGrid(gridG);
     layerG.appendChild(gridG);
 
-    // --- 엔티티 그리기 (기존 그대로) ---
-    const entsG = svg('g', {}); layerG.appendChild(entsG);
+    const entsG = svg('g', {}); 
+    layerG.appendChild(entsG);
 
+    // --- 이하 엔티티 렌더는 기존 그대로 ---
     Object.entries(rawData).forEach(([id, ent])=>{
       const pos = interp(ent, currentTime);
-      if(!pos) return;
+      if(!pos || pos.opacity <= 0) return; /* EXTRA: skip faded-out entities */
       const frame = getFrame(ent, currentTime);
       const isPerson = ent.type==='person';
       const isComp   = ent.type==='companion';
+      const entOpacity = pos.opacity ?? 1; /* EXTRA: reuse computed opacity for every visual */
 
       if (feature==='outfitColor' && isPerson && activeViews.outfitColor){
         const gradId = `grad-ex-${++GRAD_SEQ}`;
@@ -334,21 +498,21 @@ function renderExploded(p){
           grad.appendChild(svg('stop',{offset:off,'stop-color':ent.colors[i]}));
         });
         defsRoot.appendChild(grad);
-        const c = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:`url(#${gradId})`, opacity:1});
+        const c = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:`url(#${gradId})`, opacity:entOpacity});
         entsG.appendChild(c);
         addHoverHandlers(c, pos, ent.hoverText);
       }
 
       if (feature==='dwellTime' && isPerson && activeViews.dwellTime){
         const r = Math.max(6, dwellSizes[id]/2);
-        const ring = svg('circle',{cx:pos.x, cy:pos.y, r, fill:'none', stroke:ent.colors[0], 'stroke-width':2, opacity:1});
+        const ring = svg('circle',{cx:pos.x, cy:pos.y, r, fill:'none', stroke:ent.colors[0], 'stroke-width':2, opacity:entOpacity});
         entsG.appendChild(ring);
         addHoverHandlers(ring, pos, ent.hoverText);
         addInvisibleHitCircle(entsG, pos, ent.hoverText, 12);
       }
 
       if (feature==='behaviour' && isPerson && activeViews.behaviour && frame?.behavior){
-        const t = svg('text',{x:pos.x, y:pos.y-8, fill:ent.colors[0], 'font-size':3.5, 'text-anchor':'middle', opacity:1});
+        const t = svg('text',{x:pos.x, y:pos.y-8, fill:ent.colors[0], 'font-size':3.5, 'text-anchor':'middle', opacity:entOpacity});
         t.textContent = frame.behavior; entsG.appendChild(t);
         addHoverHandlers(t, pos, ent.hoverText);
         addInvisibleHitCircle(entsG, pos, ent.hoverText, 10);
@@ -356,14 +520,14 @@ function renderExploded(p){
 
       if (feature==='path' && isPerson && activeViews.path && trails[id]?.length>1){
         const d = trails[id].map((p,i)=> `${i===0?'M':'L'} ${p.x} ${p.y}`).join(' ');
-        const path = svg('path',{d, fill:'none', stroke:ent.colors[0], 'stroke-width':0.8, opacity:1});
+        const path = svg('path',{d, fill:'none', stroke:ent.colors[0], 'stroke-width':0.8, opacity:entOpacity});
         entsG.appendChild(path);
         addHoverHandlers(path, pos, ent.hoverText);
         addInvisibleHitCircle(entsG, pos, ent.hoverText, 10);
       }
 
       if (feature==='companions' && isComp && activeViews.companions){
-        const c = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:ent.colors[2], opacity:1});
+        const c = svg('circle',{cx:pos.x, cy:pos.y, r:6, fill:ent.colors[2], opacity:entOpacity});
         entsG.appendChild(c);
         addHoverHandlers(c, pos, ent.hoverText);
       }
@@ -580,6 +744,7 @@ function setView(v){
 }
 
 
+
 /* ===================== 공용 렌더 (progress 기반) ===================== */
 let explodeProgress = 0; // 0..1
 let explodeTarget   = 0;
@@ -633,6 +798,47 @@ function tick(dt){
   });
 }
 
+function handleClosing(){
+  if(showVideo === 'closing') return;
+  showVideo = 'closing';
+  if(secTimer){ clearInterval(secTimer); secTimer = null; }
+  tempScrubActive = false;
+  screenTitle.textContent = 'Closing Animation';
+  if(screenInner) screenInner.classList.add('is-hidden');
+  if(openingVideo){
+    openingVideo.pause();
+    openingVideo.currentTime = 0;
+    openingVideo.classList.add('is-hidden');
+  }
+  if(closingVideo){
+    closingVideo.classList.remove('is-hidden');
+    const closingPlay = closingVideo.play();
+    if(closingPlay && typeof closingPlay.catch === 'function'){
+      closingPlay.catch(()=>{});
+    }
+  }
+  if(backgroundVideo){
+    backgroundVideo.pause();
+  }
+  if(tempTimelineControl) tempTimelineControl.classList.add('is-hidden');
+  screen.classList.remove('is-hidden');
+  app.classList.add('is-hidden');
+}
+
+function runTimerTick(){
+  if(tempScrubActive) return;
+  if(currentTime >= 180){
+    handleClosing();
+    return;
+  }
+  currentTime = Math.min(180, currentTime + 1);
+  clockEl.textContent = formatTime(Math.floor(currentTime));
+  updateTempTimelineUI();
+  if(currentTime >= 180){
+    handleClosing();
+  }
+}
+
 /* ===================== UI ===================== */
 function setView(v){
   viewMode = v;
@@ -683,27 +889,64 @@ let lastTS = performance.now();
 let secTimer = null;
 
 function startPlayback(){
-  setTimeout(()=>{
+  const launchApp = ()=>{
     showVideo = 'none';
     screen.classList.add('is-hidden');
+    if(screenInner) screenInner.classList.add('is-hidden');
     app.classList.remove('is-hidden');
 
-    secTimer = setInterval(()=>{
-      if(currentTime >= 180){
-        clearInterval(secTimer);
-        showVideo = 'closing';
-        screenTitle.textContent = 'Closing Animation';
-        screen.classList.remove('is-hidden');
-        app.classList.add('is-hidden');
-        return;
+    currentTime = 0;
+    clockEl.textContent = formatTime(0);
+    updateTempTimelineUI(true);
+    if(tempTimelineControl) tempTimelineControl.classList.remove('is-hidden');
+
+    if(openingVideo){
+      openingVideo.pause();
+      openingVideo.currentTime = 0;
+      openingVideo.classList.add('is-hidden');
+    }
+    if(closingVideo){
+      closingVideo.pause();
+      closingVideo.currentTime = 0;
+      closingVideo.classList.add('is-hidden');
+    }
+    if(backgroundVideo){
+      const playPromise = backgroundVideo.play();
+      if(playPromise && typeof playPromise.catch === 'function'){
+        playPromise.catch(()=>{});
       }
-      currentTime += 1;
-      clockEl.textContent = formatTime(currentTime);
-    },1000);
+    }
+
+    if(secTimer){ clearInterval(secTimer); }
+    secTimer = setInterval(runTimerTick,1000);
 
     lastTS = performance.now();
     requestAnimationFrame(loop);
-  },3000);
+  };
+
+  if(screenInner) screenInner.classList.add('is-hidden');
+
+  if(openingVideo){
+    openingVideo.classList.remove('is-hidden');
+    let finished = false;
+    const finish = ()=>{
+      if(finished) return;
+      finished = true;
+      openingVideo.pause();
+      openingVideo.currentTime = 0;
+      openingVideo.classList.add('is-hidden');
+      launchApp();
+    };
+    openingVideo.addEventListener('ended', finish, { once:true });
+    openingVideo.addEventListener('error', finish, { once:true });
+    const playPromise = openingVideo.play();
+    if(playPromise && typeof playPromise.catch === 'function'){
+      playPromise.catch(finish);
+    }
+    return;
+  }
+
+  launchApp();
 }
 
 function loop(ts){
@@ -716,8 +959,12 @@ function loop(ts){
     isBlinking=false; app.classList.remove('blink'); if(loop._blink){ clearInterval(loop._blink); loop._blink=null; }
   }
 
-  tick(dt);
-  render();
+  if(tempScrubActive){
+    render();
+  }else{
+    tick(dt);
+    render();
+  }
   requestAnimationFrame(loop);
 }
 
@@ -732,5 +979,3 @@ function loop(ts){
   setView('aerial');   // 시작은 Aerial
   startPlayback();
 })();
-
-
