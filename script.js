@@ -607,6 +607,24 @@ function setView(v){
   else               animateExploded(0);
 }
 function bindUI(){
+    // === Top-nav Hover Glow ===
+// 한 번만 생성해서 body에 붙임
+// Top-nav hover glow -----------------------------
+const navGlow = document.getElementById('nav-glow');
+document.querySelectorAll('.nav-item .nav-btn').forEach(btn=>{
+  btn.addEventListener('mouseenter', ()=>{
+    const r = btn.getBoundingClientRect();
+    const cx = r.left + r.width/2;
+    const cy = r.top  + r.height/2;
+    navGlow.style.setProperty('--nx', `${cx}px`);
+    navGlow.style.setProperty('--ny', `${cy}px`);
+    navGlow.classList.add('show');
+  });
+  btn.addEventListener('mouseleave', ()=> navGlow.classList.remove('show'));
+});
+
+
+
   document.querySelectorAll('.toggle').forEach(el=>{
     const key = el.dataset.key;
     if(activeViews[key]) el.classList.add('active');
@@ -623,25 +641,7 @@ function bindUI(){
     el.addEventListener('click', ()=> setView(v));
   });
 
-  document.getElementById('btn-about').addEventListener('click', ()=>{
-    overlayTitle.textContent='About';
-    overlayBody.innerHTML = `<p>This visualization captures three minutes in the Providence Train Station waiting room, just before the 4:59 PM train departure.</p>`;
-    overlay.classList.remove('is-hidden');
-  });
-  document.getElementById('btn-key').addEventListener('click', ()=>{
-    overlayTitle.textContent='Key';
-    overlayBody.innerHTML = `
-      <p><strong>Outfit Color:</strong> Gradient dots showing clothing colors</p>
-      <p><strong>Dwell Time:</strong> Expanding circles when people stay still</p>
-      <p><strong>Behaviour:</strong> Text labels describing activities</p>
-      <p><strong>Path:</strong> Lines tracing movement trajectories</p>
-      <p><strong>Companions:</strong> Dogs, bikes, and strollers</p>`;
-    overlay.classList.remove('is-hidden');
-  });
-  overlay.addEventListener('click',(e)=>{ if(e.target===overlay) overlay.classList.add('is-hidden'); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') overlay.classList.add('is-hidden'); });
 
-  window.addEventListener('resize', ()=> render());
 }
 
 /* ===================== 메인 루프 ===================== */
@@ -699,48 +699,4 @@ function loop(ts){
   startPlayback();
 })();
 
-/* ===================== 인트로 비디오 ===================== */
-function setupIntroVideo() {
-  const video = document.getElementById("introVideo");
-
-  // 인트로 재생 시작
-  showVideo = "opening";
-
-  // 자동재생 시도 (정책상 막히면 일단 무음 재생 시도)
-  const tryPlay = async () => {
-    try {
-      await video.play();
-    } catch (err) {
-      console.warn("Autoplay blocked, waiting for user gesture");
-      // iOS 등에서 자동재생이 막히면 첫 클릭 이벤트로 다시 시도
-      const handler = () => {
-        video.play();
-        document.removeEventListener("click", handler);
-      };
-      document.addEventListener("click", handler);
-    }
-  };
-
-  tryPlay();
-
-  // 영상 끝나면 본 앱 실행
-  video.addEventListener("ended", finishIntro);
-
-  // 혹시 로딩 실패 시 안전하게 넘어가도록 fallback
-  video.addEventListener("error", () => {
-    console.warn("Video failed to load, skipping intro.");
-    finishIntro();
-  });
-}
-
-/* ===================== 인트로 종료 후 앱 실행 ===================== */
-function finishIntro() {
-  if (showVideo !== "opening") return;
-  showVideo = "none";
-  const screen = document.getElementById("screen");
-  const app = document.getElementById("app");
-  screen.classList.add("is-hidden");
-  app.classList.remove("is-hidden");
-  startApp(); // 시계 및 인터랙션 시작
-}
 
