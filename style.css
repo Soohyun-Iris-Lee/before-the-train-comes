@@ -1,13 +1,41 @@
+
 @font-face {
   font-family: "Beretta Sans Trial";
-  src: url("/fonts/BerettaSansTrial-Bold.woff") format("woff");
-  font-weight: 700;       /* 굵기: Bold */
+  src: url("./fonts/BerettaSansTrial-Bold.woff") format("woff");
+  font-weight: 700;
   font-style: normal;
-  font-display: swap;     /* 폰트 로딩 중 시스템 폰트 먼저 표시 */
+  font-display: swap;
 }
+
+/* 2) PP Mori — Regular (400) */
+@font-face {
+  font-family: "PP Mori";
+  src: url("./fonts/PPMori-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 3) PP Mori — ExtraLight (200) */
+@font-face {
+  font-family: "PP Mori";
+  src: url("/fonts/PPMori-Extralight.woff") format("woff");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PP Mori Terrible";
+  src: url("./fonts/PPMori-Terrible.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 :root{
-  --bg:#532b2f;
-  --bg-blink:#8B0000;
+  --bg:#642e35;
   --fg:#fffbe0;
   --grid:#fffbe0;
   --grid-muted:#c9b896;
@@ -17,53 +45,110 @@
   --cy: 50%;
   --r: 0px;
 
-  /* 동적 그라디언트 색(엔티티별로 JS가 변경) */
-  --hover-c1: rgba(255,250,216,0.90);  /* 중앙 - 쨍 */
-  --hover-c2: rgba(255,250,216,0.55);  /* 중간 */
-  --hover-c3: rgba(255,250,216,0.00);  /* 가장자리 완전 페이드 */
-
-  /* 스테이지 위치/크기 */
-  --stage-scale: 1.80;
-  --stage-shift-y: 60px;
+  /* 스테이지 위치/크기(한 번에 조절) */
+  --stage-scale: 1.80;     /* 그리드 전체 크기 비율 */
+  --stage-shift-y: 60px;   /* 그리드를 화면 아래로 이동 */
 
   /* 시계 */
   --clock-size: 98px;
   --clock-nudge-y: -6px;
 
-  /* 사이드 패널 */
-  --side-top: 150px;
+  /* 사이드 패널 Y */
+  --side-top: 220px;
 
-  /* Exploded 파라미터 */
-  --exp-gap: 32;
+  /* Exploded View 파라미터 */
+      /* 레이어 간격(px, SVG공간 translateY) */
+  --exp-gap: 32;          /* 숫자만 바꾸면 간격이 변함 (viewBox 단위) */
   --exp-target-squash: .22;
+    --bg-target-shift: 40vh;     /* Exploded에서 아래로 내릴 양(취향껏 튜닝) */
+  --bg-k: 0;                   /* JS가 0→1로 갱신 */
+  --bg-scaleY: 1;    
 }
 
-/* reset & 기본 */
+
+
+/* 실제 비디오는 래퍼 안에서 전체 채움 */
+.bg-video{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+.bg-video--base{
+  z-index:-1;              /* sits behind everything */
+  transform:none !important;  /* immune to the --bg-scaleY/--bg-k transforms */
+}
+
+
+/* reset */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
   margin:0; background:var(--bg); color:var(--fg);
-  font-family:"General Sans", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  font-family: "PP Mori", sans-serif;
+  font-weight: 200
+}
+
+.bg-video{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+  background:#000;
 }
 .is-hidden{display:none !important}
 
 /* ===== 전체 화면 SVG ===== */
+
+
+.bg-wrap{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  transform-origin: 50% 50%;
+  transform: translateY(calc(var(--bg-k) * var(--bg-target-shift))) scale(1, var(--bg-scaleY));
+  transition: transform 600ms ease;
+}
+
+.alert-layer{
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(255, 0, 0, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms linear;
+}
+
+.alert-layer.is-active{
+  visibility: visible;
+  opacity: 1;
+}
+
 .stage{
-  position:fixed; inset:0;
-  width:100vw; height:100vh; display:block;
-  z-index:1;
-  pointer-events:none;
+  position: fixed;
+  inset: 0;
+  width: 100vw; height: 100vh; display: block;
+  z-index: 2;                 /* above background */
+  pointer-events: none;
   transform-origin: 50% 50%;
   transform: translateY(var(--stage-shift-y)) scale(var(--stage-scale));
-  isolation:isolate;
+  isolation: isolate;
 }
+
 #grid-circles, #grid-spokes, #outer-segments{ pointer-events:none; }
-#entities{ pointer-events:auto; }
+#entities{ pointer-events:auto; }  /* ✅ 엔티티만 인터랙션 허용 */
 #entities *{ pointer-events:auto; }
 
 .stage.exploded {
   transform: translateY(-30px) scale(var(--stage-scale)) !important;
 }
+
+
+/* ===== 호버 리플 & 텍스트 ===== */
 /* ===== 호버 리플 & 텍스트 ===== */
 .hover-overlay{
   position:fixed; inset:0; z-index:20; pointer-events:none;
@@ -84,24 +169,125 @@ body{
 }
 .hover-overlay.active{ --r:120vmax; opacity:1; }
 
-.hover-text{
-  position:fixed; left:var(--cx); top:var(--cy);
-  transform: translate(-50%,-120%);
-  max-width:420px; padding:0; background:transparent; border:none;
-  color:var(--fg); text-shadow:none; font-size:15px; line-height:1.35;
-  z-index:21; opacity:0; transition:opacity .25s ease;
+.hover-text {
+  position: fixed;
+  left: var(--cx);
+  top: var(--cy);
+  transform: translate(-50%, -120%);
+  max-width: 420px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--fg);
+  text-shadow: none;
+  font-size: 15px;
+  line-height: 1.35;
+  z-index: 21;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+
+  /* ✅ PP Mori Regular */
+  font-family: "PP Mori", sans-serif;
+  font-weight: 400;
 }
+
+
 .hover-overlay.active .hover-text{ opacity:1; }
 
 /* ===== Opening/Closing ===== */
-.screen{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:var(--bg); z-index:1000; }
-.screen-inner{text-align:center}
+.landing{ /* ADD: landing overlay styles */
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:url("./landingbackground.png") center/cover no-repeat;
+  z-index:1600;
+  opacity:1;
+  transition:opacity 800ms ease;
+}
+.landing.is-hidden{ /* ADD: hidden landing overlay */
+  opacity:0;
+  pointer-events:none;
+}
+.landing-btn{ /* ADD: start button */
+  width:min(420px, 80vw);
+  aspect-ratio:2338 / 774;
+  border:none;
+  border-radius:0;
+  background:url("./landingbutton.png") center/contain no-repeat;
+  color:transparent;
+  font-size:0;
+  display:block;
+  padding:0;
+  transform:translateY(25vh) scale(1);
+  cursor:pointer;
+
+    transition: 
+    opacity 0.4s ease,      /* 부드러운 투명도 전환 */
+    transform 0.4s ease;
+}
+.landing-btn:hover,
+.landing-btn:focus-visible{
+
+  outline:none;
+  opacity:0.5;
+}
+.landing-btn:active{
+  transform:translateY(25vh) scale(0.95);
+}
+.sr-only{ /* ADD: screen reader helper */
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+.screen{
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background:var(--bg); z-index:1000; overflow:hidden;
+  opacity:1; transition:opacity 600ms ease;
+}
+.screen.is-transparent{
+  opacity:0;
+  pointer-events:none;
+}
+.screen-video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  z-index:0;
+  display:block;
+  background:#000;
+}
+#closing-video.is-fading-in{
+  opacity:0;
+  transition:opacity 0.6s ease;
+}
+#closing-video.is-visible{
+  opacity:1;
+}
+#opening-video.is-fading-in{
+  opacity:0;
+  transition:opacity 0.6s ease;
+}
+#opening-video.is-visible{
+  opacity:1;
+}
+.companion-icon{ /* ADD: tweak companion icon styling */
+  pointer-events:auto;
+}
+
+.screen-inner{position:relative; z-index:1; text-align:center}
 .screen-title{font-size:48px}
-.screen-sub{font-size:18px; margin-top:20px; opacity:.8}
+
 
 /* ===== UI ===== */
-.app{ min-height:100vh; transition:background .2s }
-.app.blink{ background:var(--bg-blink) }
+.app{ min-height:100vh; transition:background .2s; background:var(--bg); }
 
 .site-header{
   position:fixed; left:0; right:0; top:0;
@@ -117,57 +303,76 @@ body{
 .top-nav { display:flex; gap:32px; align-items:center; position: relative;
   right: 42px;}
 .nav-item { position:relative; }
-.nav-btn{
-  background:none; border:0; cursor:pointer;
-  font:200 1.4rem/1 "General Sans", sans-serif;
-  color:#fffbe0; transition:color .25s ease;
-}
-.nav-item:hover .nav-btn{ color:#532b2f; }
-.desc{
-  position: fixed; top: 50%; left: 50%;
-  transform: translate(-50%, -50%) translateY(10px);
-  width: auto; max-width: 480px; text-align: center;
-  font-family:'General Sans',sans-serif; font-size: 1rem; line-height: 1.6; color: #532b2f;
-  opacity: 0; pointer-events: none; transition: opacity .4s ease, transform .4s ease;
-  background: none; box-shadow: none; padding: 0;
-}
-.nav-item:hover .desc { opacity:1; transform: translate(-50%, -50%) translateY(0); }
 
-/* Top-nav 전용 글로우 */
-.nav-glow{
-  position:fixed; inset:0; z-index:25; pointer-events:none;
-  --nx:50%; --ny:50%; --r:0vmax;
-  background: radial-gradient(
-    circle at var(--nx) var(--ny),
-    rgba(255,250,216,0.96) 0%,
-    rgba(255,250,216,0.90) 28%,
-    rgba(255,250,216,0.56) 70%,
-    rgba(255,250,216,0.00) 100%
-  );
-  clip-path:circle(var(--r) at var(--nx) var(--ny));
-  opacity:0; transition:clip-path .5s ease, opacity .5s ease;
-}
-.nav-glow.show{ --r:1000vmax; opacity:1; }
+.navbtn:focus-visible{ outline:2px dashed var(--fg); outline-offset:2px }
 
 /* 좌/우 패널 */
-.left,.right{ position:fixed; top:var(--side-top); width:189px; z-index:30; background:transparent; }
+.left,.right{
+  position:fixed; top:var(--side-top); width:189px; z-index:30; background:transparent;
+}
 .left{ left:80px; } .right{ right:80px; }
-.side-title{ font-size:21px; font-weight:200; margin:0 0 6px 0 }
-.toggle,.view-toggle{ display:flex; align-items:center; gap:12px; padding:8px 0; cursor:pointer; user-select:none; color:var(--fg); }
-.toggle .dot,.view-toggle .dot{ width:16px; height:16px; border-radius:50%; border:1px solid var(--fg); background:transparent; flex:0 0 auto; }
+.side-title {
+  font-family: "PP Mori", sans-serif;
+  font-weight: 200;          /* ExtraLight */
+  font-size: 21px;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.toggle,.view-toggle{
+  display:flex; align-items:center; gap:12px; padding:8px 0; cursor:pointer; user-select:none; color:var(--fg);
+}
+.toggle .dot,.view-toggle .dot{
+  width:16px; height:16px; border-radius:50%;
+  border:1px solid var(--fg); background:transparent; flex:0 0 auto;
+}
 .toggle.active .dot,.view-toggle.active .dot{ background:var(--fg) }
 .toggle .label,.view-toggle .label{ font-size:21px; font-weight:200 }
 
-/* Exploded 전용 보조 스타일 */
+/* 모달 */
+.overlay{
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, rgba(83,43,47,.95), rgba(255,251,224,.15));
+  z-index:999; cursor:pointer;
+}
+.overlay-card{ cursor:auto; max-width:600px; padding:40px; font-size:21px; text-align:center; }
+.overlay-title{ font-size:48px; margin:0 0 20px 0 }
+.overlay-body p{ margin:0 0 .5em 0 }
+
+/* Exploded 레이어 강/약 */
+.exploded-dim { opacity: var(--exp-dim); }
+.exploded-strong { opacity: 1; }
+
+/* 점선/분절 스타일(Exploded용) */
+.exp-grid-dot { stroke:none; fill:var(--grid); opacity:.45; }
+.exp-segment  { stroke:var(--grid-muted); stroke-width:8; stroke-linecap:round; fill:none; opacity:.9; }
+
+/* 의상 팔레트용 약간의 블러 */
+.exp-blur { filter: url(#exp-blur); }
+
+/* Aerial에서 쓰는 기본 그리드는 Exploded에선 숨긴다 */
 .stage.exploded #grid-circles,
 .stage.exploded #grid-spokes,
 .stage.exploded #outer-segments { display:none; }
-.exp-grid-dot { stroke:none; fill:var(--grid); opacity:.45; }
-.exp-segment  { stroke:var(--grid-muted); stroke-width:8; stroke-linecap:round; fill:none; opacity:.9; }
-.exp-layer{ transform-box: view-box; transform-origin: 0 0; }
-.stage.exploded { transform: translateY(0) scale(var(--stage-scale)); }
+
+/* Exploded로 생성되는 레이어 공통 */
+.exp-layer{
+  /* SVG에서 CSS 트랜스폼 기준을 뷰박스로 고정 */
+  transform-box: view-box;
+  transform-origin: 0 0;     /* 아래서 명시적으로 중심 이동해서 스케일링 */
+}
+
+/* 시계와 겹치지 않도록 위쪽 마진을 확보하기 위해 stage 자체도 조금 내림(필요시) */
+
+/* 디밍/스큐 관련 이전 클래스가 있었다면 무력화 */
 .exploded-dim, .exploded-strong { opacity: 1 !important; }
+
+/* 전환 중 GPU 힌트 */
 .stage, .exp-layer, .aerial-wrap { will-change: transform, opacity; }
+
+/* (선택) 전환 중 인터랙션 잠깐 막기 */
 .body--transitioning #entities { pointer-events:none; }
 
 
@@ -182,14 +387,23 @@ body{
 .nav-item { position:relative; }
 
 /* 버튼 기본/호버 색 */
-.nav-btn{
-  background:none; border:0; cursor:pointer;
-  font:600 1rem/1 "General Sans", sans-serif;
-  color:#fffbe0; transition:color .25s ease;
+.nav-btn {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: "PP Mori", sans-serif;
+  font-weight: 200;          /* ExtraLight */
+  font-size: 21px;           /* ✅ .side-title과 동일 크기 */
+  line-height: 1.2;
+  color: #fffbe0;
+  transition: color 0.25s ease;
+   margin-left: 0px; 
+   margin-bottom: 30px
 }
 .nav-item:hover .nav-btn{ color:#532b2f; }
 
 /* 설명 툴팁: 기본 숨김, hover 시 보이기 */
+
 .desc{
    position: fixed;            /* 화면 기준 중앙 배치 */
   top: 50%;
@@ -198,7 +412,8 @@ body{
   width: auto;
   max-width: 480px;
   text-align: center;
-  font-family: 'General Sans', sans-serif;
+  font-family: "PP Mori", sans-serif;
+  font-weight: 400;
   font-size: 1rem;
   line-height: 1.6;
   color: #532b2f;
@@ -209,9 +424,18 @@ body{
   box-shadow: none;           /* 그림자 제거 */
   padding: 0;    
 }
+
+
 .nav-item:hover .desc {
   opacity: 1;
   transform: translate(-50%, -50%) translateY(0);
+}
+.key-image {
+  position: relative;
+  left: 50%;
+  width: 150%;
+  transform: translateX(-50%);
+  display: block;
 }
 
 /* 헤더 버튼 호버용 글로우 레이어(가득 퍼지고 가장자리 0%) */
@@ -232,3 +456,48 @@ body{
   opacity:0; transition:clip-path .5s ease, opacity .5s ease;
 }
 .nav-glow.show{ --r:1000vmax; opacity:1; }
+
+/* Position top-left; tweak offsets/width as you like */
+.logo-stack{
+  position: fixed;
+  top: 5px;           /* ← adjust */
+  left: 12px;          /* ← adjust */
+  width: 300px;        /* ← desired logo width */
+  z-index: 1000;
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* Make the two images stack perfectly */
+.logo-stack img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.logo-base{
+  position: relative;  /* stays underneath */
+  opacity: 1;
+}
+
+/* The overlay image that fades in */
+.logo-hover{
+  position: absolute;
+  inset: 0;            /* top:0; right:0; bottom:0; left:0 */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+/* Hover/focus crossfade */
+.logo-stack:hover .logo-hover,
+.logo-stack:focus-visible .logo-hover,
+.logo-stack:focus-within .logo-hover{
+  opacity: 1;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .logo-hover{ transition: none; }
+}
+
